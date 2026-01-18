@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HusoftTech | App Details</title>
+    <meta name="description" content="Explore HusoftTech iOS app details and download links." />
+    <meta property="og:title" content="HusoftTech | App Details" />
+    <meta property="og:description" content="Explore HusoftTech iOS app details and download links." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://husofttech.com/app.html" />
+    <meta property="og:image" content="assets/brand/logo.png" />
+    <link rel="icon" href="assets/brand/favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js" defer></script>
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <div id="particles-js" aria-hidden="true"></div>
+    <main class="main-stage">
+      <div class="center-panel">
+        <div class="panel-scroll">
+          <section class="container">
+            <div id="app-error" class="alert alert-warning d-none" role="status" aria-live="polite"></div>
+            <div id="app-content" class="d-none">
+              <div class="row g-4 align-items-center mb-5">
+                <div class="col-lg-8">
+                  <div class="d-flex align-items-start gap-4 flex-wrap">
+                    <div class="d-flex align-items-center gap-3 brand-lockup">
+                      <img src="assets/brand/logo.png" alt="HusoftTech logo" width="64" height="64" />
+                      <span class="fw-semibold fs-5">HusoftTech</span>
+                    </div>
+                    <img id="app-icon" class="app-icon" alt="" />
+                    <div>
+                      <h1 id="app-name" class="display-6 fw-semibold"></h1>
+                      <p id="app-tagline" class="text-muted"></p>
+                      <p id="app-short" class="lead"></p>
+                      <div class="d-flex flex-wrap gap-3">
+                        <a id="app-store" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+                          Download on the App Store
+                        </a>
+                        <a class="btn btn-outline-primary btn-lg" href="index.html">Back to Home</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-4">
+                <div class="col-lg-8">
+                  <h2 class="h3">About this app</h2>
+                  <p id="app-long" class="text-muted"></p>
+
+                  <h3 class="h5 mt-4">Key features</h3>
+                  <ul id="app-features" class="text-muted"></ul>
+                </div>
+                <div class="col-lg-4">
+                  <div class="card border-0 shadow-sm bg-soft p-4">
+                    <h3 class="h5">Links</h3>
+                    <div id="app-links" class="d-grid gap-2"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <h2 class="h3">Screenshots</h2>
+                <div id="app-screenshots" class="row g-3 mt-2"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="py-1 border-top">
+      <div class="container text-muted small text-center">
+        © <span id="current-year"></span> HusoftTech. All rights reserved.
+      </div>
+    </footer>
+
+    <script type="application/json" id="apps-data">
+      {
+  "brand": {
+    "name": "HusoftTech",
+    "tagline": "Clean, focused apps for daily momentum.",
+    "email": "husofttech@gmail.com",
+    "copyrightOwner": "HusoftTech"
+  },
+  "apps": {
+    "trip-checklist": {
+      "id": "trip-checklist",
+      "name": "TripChecklist",
+      "tagline": "Smart travel checklists and tips",
+      "shortDescription": "Plan stress-free trips with smart checklists, essential lists, and practical travel tips.",
+      "longDescription": "Planning a trip should be simple and stress free. TripChecklist helps you stay organized, prepared, and confident so you can focus on enjoying your journey instead of worrying about what you forgot. Whether it is a weekend getaway or a long international trip, TripChecklist guides you step by step through everything you need to prepare, pack, and remember. TripChecklist is your quiet travel companion, helping you prepare better, pack smarter, and travel with confidence.",
+      "features": [
+        "Smart checklists with ready-made stages and easy customization",
+        "Full essentials list with one-tap add to your checklist",
+        "Trip hacks with bite-size, practical travel tips",
+        "Fully customizable items and sections",
+        "Calm, distraction-free interface built for real travelers",
+        "Works offline once content is loaded"
+      ],
+      "appStoreUrl": "https://apps.apple.com/app/id000000000",
+      "icon": "assets/apps/trip-checklist/TripChecklist-Default.png",
+      "screenshots": [
+        "assets/apps/trip-checklist/screenshots/01-checklist.png",
+        "assets/apps/trip-checklist/screenshots/01-checklistProgress.png",
+        "assets/apps/trip-checklist/screenshots/02-fullist.png",
+        "assets/apps/trip-checklist/screenshots/03-tripHack.png"
+      ],
+      "websiteUrl": "https://husofttech.com",
+      "supportEmail": "husofttech@gmail.com",
+      "privacyPolicyUrl": "assets/apps/trip-checklist/policy/privacy.html"
+    }
+  }
+}
+    </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

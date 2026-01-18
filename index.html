@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HusoftTech | iOS Apps Portfolio</title>
+    <meta name="description" content="HusoftTech builds clean, focused iOS apps. Explore the portfolio." />
+    <meta property="og:title" content="HusoftTech | iOS Apps Portfolio" />
+    <meta property="og:description" content="HusoftTech builds clean, focused iOS apps. Explore the portfolio." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://husofttech.com" />
+    <meta property="og:image" content="assets/brand/logo.png" />
+    <link rel="icon" href="assets/brand/favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js" defer></script>
+    <script src="js/main.js" defer></script>
+  </head>
+  <body>
+    <div id="particles-js" aria-hidden="true"></div>
+    <main class="main-stage">
+      <div class="center-panel">
+        <div class="panel-scroll">
+          <section class="hero-section py-5">
+            <div class="container py-lg-4">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-7">
+                <div class="d-flex align-items-center gap-3 mb-3 brand-lockup">
+                  <img src="assets/brand/logo.png" alt="HusoftTech logo" width="64" height="64" />
+                  <span class="fw-semibold fs-4">HusoftTech</span>
+                </div>
+                <p class="text-uppercase small text-muted mb-2">iOS apps by HusoftTech</p>
+                <h1 class="display-5 fw-semibold">Clean, focused apps for daily momentum.</h1>
+                <p class="lead text-muted mt-3">
+                  We build fast, reliable iOS apps with a minimalist touch. Discover what we're shipping now and what's
+                  next.
+                </p>
+                <a class="btn btn-primary btn-lg mt-2" href="#apps">View Apps</a>
+              </div>
+            </div>
+            </div>
+          </section>
+
+          <section id="apps" class="py-5 bg-soft">
+          <div class="container">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-4">
+            <div>
+              <h2 class="h1 mb-2">Apps</h2>
+              <p class="text-muted mb-0">Browse current releases. More apps are on the way.</p>
+            </div>
+          </div>
+          <div id="apps-grid" class="row g-4 apps-grid" role="list"></div>
+          <div id="apps-error" class="alert alert-warning mt-4 d-none" role="status" aria-live="polite">
+            Unable to load apps right now. Please try again later.
+          </div>
+          </div>
+          </section>
+
+          <section id="about" class="py-5">
+          <div class="container">
+          <div class="row">
+            <div class="col-lg-8">
+              <h2 class="h1 mb-3">About</h2>
+              <p class="text-muted">
+                HusoftTech builds focused iOS apps with an emphasis on clarity, performance, and thoughtful design. Our mission is to create tools that help users maintain momentum in their daily lives without unnecessary complexity.
+              </p>
+            </div>
+          </div>
+          </div>
+          </section>
+
+          <section id="contact" class="py-5 bg-soft">
+          <div class="container">
+          <div class="row">
+            <div class="col-lg-8">
+              <h2 class="h1 mb-3">Contact</h2>
+              <p class="text-muted">
+                For partnerships, feedback, or support, reach us at
+                <a href="mailto:husofttech@gmail.com">husofttech@gmail.com</a>.
+              </p>
+            </div>
+          </div>
+          </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="py-1 border-top">
+      <div class="container text-muted small text-center">
+        © <span id="current-year"></span> HusoftTech. All rights reserved.
+      </div>
+    </footer>
+
+    <script type="application/json" id="apps-data">
+      {
+  "brand": {
+    "name": "HusoftTech",
+    "tagline": "Clean, focused apps for daily momentum.",
+    "email": "husofttech@gmail.com",
+    "copyrightOwner": "HusoftTech"
+  },
+  "apps": {
+    "trip-checklist": {
+      "id": "trip-checklist",
+      "name": "TripChecklist",
+      "tagline": "Smart travel checklists and tips",
+      "shortDescription": "Plan stress-free trips with smart checklists, essential lists, and practical travel tips.",
+      "longDescription": "Planning a trip should be simple and stress free. TripChecklist helps you stay organized, prepared, and confident so you can focus on enjoying your journey instead of worrying about what you forgot. Whether it is a weekend getaway or a long international trip, TripChecklist guides you step by step through everything you need to prepare, pack, and remember. TripChecklist is your quiet travel companion, helping you prepare better, pack smarter, and travel with confidence.",
+      "features": [
+        "Smart checklists with ready-made stages and easy customization",
+        "Full essentials list with one-tap add to your checklist",
+        "Trip hacks with bite-size, practical travel tips",
+        "Fully customizable items and sections",
+        "Calm, distraction-free interface built for real travelers",
+        "Works offline once content is loaded"
+      ],
+      "appStoreUrl": "https://apps.apple.com/app/id000000000",
+      "icon": "assets/apps/trip-checklist/TripChecklist-Default.png",
+      "screenshots": [
+        "assets/apps/trip-checklist/screenshots/01-checklist.png",
+        "assets/apps/trip-checklist/screenshots/01-checklistProgress.png",
+        "assets/apps/trip-checklist/screenshots/02-fullist.png",
+        "assets/apps/trip-checklist/screenshots/03-tripHack.png"
+      ],
+      "websiteUrl": "https://husofttech.com",
+      "supportEmail": "husofttech@gmail.com",
+      "privacyPolicyUrl": "assets/apps/trip-checklist/policy/privacy.html"
+    }
+  }
+}
+
+    </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
