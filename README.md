@@ -6,6 +6,15 @@ A lightweight, static portfolio for HusoftTech iOS apps. Built with HTML, Bootst
 
 Open `index.html` directly in your browser. All app data is stored inline in `index.html` and `app.html`, so no local server is required.
 
+## Brand info (from index.html)
+
+The homepage reads brand metadata from the inline JSON in `index.html`:
+
+- Name: HusoftTech
+- Tagline: Clean, focused apps for daily momentum.
+- Email: husofttech@gmail.com
+- Copyright owner: HusoftTech
+
 ## Add a new app
 
 1. In both `index.html` and `app.html`, find the `<script id="apps-data">` block.
