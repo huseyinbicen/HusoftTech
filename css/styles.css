@@ -90,6 +90,49 @@ body {
   padding: 24px 0;
 }
 
+.doc-sheet {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 36px;
+  background: #ffffff;
+  border: 1px solid var(--hs-border);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
+  color: #0b0b0b;
+}
+
+.brand-mark {
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+}
+
+.brand-link {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+.doc-divider {
+  border: 0;
+  height: 1px;
+  background: #0b0b0b;
+  margin: 18px 0 24px;
+  opacity: 0.2;
+}
+
+.app-logo-image {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  border: 2px solid #0b0b0b;
+  object-fit: cover;
+  display: inline-block;
+}
+
+.doc-sheet .text-muted {
+  color: #0b0b0b !important;
+  opacity: 0.7;
+}
+
 .bg-soft {
   background-color: rgba(255, 255, 255, 0.85);
 }
@@ -341,6 +384,11 @@ a:hover {
   .panel-scroll {
     max-height: calc(100vh - 130px);
     padding: 16px 0;
+  }
+
+  .doc-sheet {
+    padding: 24px 20px;
+    border-radius: 16px;
   }
 }
 :root {

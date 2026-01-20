@@ -15,6 +15,67 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const particlesHost = document.getElementById("particles-js");
 const inlineAppsData = document.getElementById("apps-data");
 
+const getBaseUrl = () => {
+  if (window.location.origin && window.location.origin !== "null") {
+    return window.location.origin;
+  }
+  return "https://husofttech.com";
+};
+
+const toAbsoluteUrl = (path) => {
+  if (!path) return "";
+  try {
+    return new URL(path, `${getBaseUrl()}/`).toString();
+  } catch (error) {
+    return path;
+  }
+};
+
+const setMetaContent = (selector, value) => {
+  const element = document.querySelector(selector);
+  if (element && value) {
+    element.setAttribute("content", value);
+  }
+};
+
+const setCanonicalUrl = (url) => {
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical && url) {
+    canonical.setAttribute("href", url);
+  }
+};
+
+const updateStructuredData = (app, canonicalUrl, imageUrl) => {
+  if (!app || !canonicalUrl) return;
+  const script = document.getElementById("app-structured-data") || document.createElement("script");
+  script.type = "application/ld+json";
+  script.id = "app-structured-data";
+  script.textContent = JSON.stringify(
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      name: app.name,
+      description: app.shortDescription,
+      operatingSystem: "iOS",
+      applicationCategory: "UtilitiesApplication",
+      url: canonicalUrl,
+      image: imageUrl,
+      screenshot: Array.isArray(app.screenshots) ? app.screenshots.map((shot) => toAbsoluteUrl(shot)) : [],
+      publisher: {
+        "@type": "Organization",
+        name: "HusoftTech",
+        url: getBaseUrl(),
+      },
+    },
+    null,
+    2
+  );
+
+  if (!script.parentElement) {
+    document.head.appendChild(script);
+  }
+};
+
 const getAppId = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("id") || params.get("slug");
@@ -47,10 +108,24 @@ const getInlineApps = () => {
 
 const renderApp = (app) => {
   document.title = `HusoftTech | ${app.name}`;
-  const ogTitle = document.querySelector('meta[property="og:title"]');
-  if (ogTitle) {
-    ogTitle.setAttribute("content", `HusoftTech | ${app.name}`);
-  }
+  const baseUrl = getBaseUrl();
+  const canonicalUrl = new URL("app.html", `${baseUrl}/`);
+  canonicalUrl.searchParams.set("id", app.id);
+  const canonicalHref = canonicalUrl.toString();
+  const imageUrl = toAbsoluteUrl(app.icon);
+  const description = app.shortDescription || "Explore HusoftTech iOS app details and download links.";
+
+  setMetaContent('meta[property="og:title"]', `HusoftTech | ${app.name}`);
+  setMetaContent('meta[name="twitter:title"]', `HusoftTech | ${app.name}`);
+  setMetaContent('meta[name="description"]', description);
+  setMetaContent('meta[property="og:description"]', description);
+  setMetaContent('meta[name="twitter:description"]', description);
+  setMetaContent('meta[property="og:url"]', canonicalHref);
+  setMetaContent('meta[name="twitter:url"]', canonicalHref);
+  setMetaContent('meta[property="og:image"]', imageUrl);
+  setMetaContent('meta[name="twitter:image"]', imageUrl);
+  setCanonicalUrl(canonicalHref);
+  updateStructuredData(app, canonicalHref, imageUrl);
 
   appIcon.src = app.icon;
   appIcon.alt = `${app.name} app icon`;

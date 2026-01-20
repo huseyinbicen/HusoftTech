@@ -5,6 +5,22 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const particlesHost = document.getElementById("particles-js");
 const inlineAppsData = document.getElementById("apps-data");
 
+const getBaseUrl = () => {
+  if (window.location.origin && window.location.origin !== "null") {
+    return window.location.origin;
+  }
+  return "https://husofttech.com";
+};
+
+const toAbsoluteUrl = (path) => {
+  if (!path) return "";
+  try {
+    return new URL(path, `${getBaseUrl()}/`).toString();
+  } catch (error) {
+    return path;
+  }
+};
+
 const createAppCard = (app) => {
   const col = document.createElement("div");
   col.className = "col-12 col-md-6 col-lg-4";
@@ -32,6 +48,7 @@ const renderApps = (apps) => {
     appsGrid.appendChild(createAppCard(app));
   });
   initRevealObserver();
+  updateStructuredData(apps);
 };
 
 const showError = (message) => {
@@ -69,6 +86,36 @@ const loadApps = async () => {
   } catch (error) {
     console.error(error);
     showError("Unable to load apps right now. Please try again later.");
+  }
+};
+
+const updateStructuredData = (apps) => {
+  if (!Array.isArray(apps)) return;
+  const baseUrl = getBaseUrl();
+  const itemList = apps.map((app, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: app.name,
+    url: toAbsoluteUrl(`app.html?id=${encodeURIComponent(app.id)}`),
+    image: toAbsoluteUrl(app.icon),
+  }));
+
+  const script = document.getElementById("apps-structured-data") || document.createElement("script");
+  script.type = "application/ld+json";
+  script.id = "apps-structured-data";
+  script.textContent = JSON.stringify(
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: itemList,
+      url: baseUrl,
+    },
+    null,
+    2
+  );
+
+  if (!script.parentElement) {
+    document.head.appendChild(script);
   }
 };
 
