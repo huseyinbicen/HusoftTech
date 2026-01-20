@@ -238,6 +238,18 @@ footer {
   text-underline-offset: 3px;
 }
 
+.contact-email,
+.contact-email:visited {
+  color: #ffffff !important;
+  text-decoration-color: rgba(255, 255, 255, 0.7);
+}
+
+.contact-email:hover,
+.contact-email:focus {
+  color: #ffffff !important;
+  text-decoration-color: rgba(255, 255, 255, 0.9);
+}
+
 .panel-scroll a:not(.btn):hover {
   color: #111827;
   text-decoration-color: rgba(15, 23, 42, 0.6);

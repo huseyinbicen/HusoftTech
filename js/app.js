@@ -149,7 +149,7 @@ const renderApp = (app) => {
     );
   }
   if (app.supportEmail) {
-    links.push(`<a class="btn btn-outline-primary" href="mailto:${app.supportEmail}">Support</a>`);
+    links.push('<a class="btn btn-outline-primary" href="support.html">Support</a>');
   }
   if (links.length === 0) {
     links.push('<p class="text-muted mb-0">No additional links provided.</p>');
