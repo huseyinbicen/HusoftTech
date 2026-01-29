@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover" />
     <title>HusoftTech | App Details</title>
     <meta name="description" content="Explore HusoftTech iOS app details and download links." />
     <meta name="robots" content="index, follow" />
@@ -25,6 +25,9 @@
     <link rel="icon" href="assets/brand/favicon-48.ico" type="image/x-icon" sizes="48x48" />
     <link rel="icon" href="assets/brand/favicon-96.ico" type="image/x-icon" sizes="96x96" />
     <link rel="icon" href="assets/brand/favicon-192.ico" type="image/x-icon" sizes="192x192" />
+    <link rel="preload" href="assets/brand/logo.png" as="image" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
     <script>
       if (location.protocol === "http:" && location.hostname && location.hostname !== "localhost") {
         location.replace(`https://${location.host}${location.pathname}${location.search}${location.hash}`);
@@ -52,7 +55,7 @@
                 <div class="col-lg-8">
                   <div class="d-flex align-items-center gap-3 brand-lockup">
                     <a class="brand-link" href="index.html" aria-label="Go to home page">
-                      <img src="assets/brand/logo.png" alt="HusoftTech logo" width="64" height="64" />
+                      <img src="assets/brand/logo.png" alt="HusoftTech logo" width="64" height="64" fetchpriority="high" />
                     </a>
                     <span class="fw-semibold fs-5">HusoftTech</span>
                   </div>

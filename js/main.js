@@ -28,7 +28,7 @@ const createAppCard = (app) => {
 
   col.innerHTML = `
     <div class="app-card p-4 d-flex flex-column gap-3 reveal">
-      <img src="${app.icon}" alt="${app.name} app icon" loading="lazy" />
+      <img src="${app.icon}" alt="${app.name} app icon" width="64" height="64" loading="lazy" />
       <div>
         <h3 class="h5">${app.name}</h3>
         <p class="text-muted mb-0">${app.tagline}</p>
