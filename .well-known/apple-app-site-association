@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "SPTXUSP4WU.com.husofttech.meowkit",
+        "paths": ["*"]
+      }
+    ]
+  }
+}
