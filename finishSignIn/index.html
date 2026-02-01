@@ -17,9 +17,7 @@
             text-align: center;
             padding: 20px;
         }
-        .container {
-            max-width: 400px;
-        }
+        .container { max-width: 400px; }
         h1 { font-size: 32px; margin-bottom: 16px; }
         p { font-size: 18px; opacity: 0.9; margin-bottom: 24px; }
         .button {
@@ -32,43 +30,77 @@
             font-weight: 600;
             font-size: 16px;
             margin: 8px;
+            cursor: pointer;
+            border: none;
         }
         .button:hover { background: #f0f0f0; }
-    </style>
-    <script>
-        // Auto-redirect to app if on iOS
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            
-            if (isIOS) {
-                // Try to open in app
-                const fullURL = window.location.href;
-                const appURL = fullURL.replace('https://husofttech.com', 'meowkit://');
-                window.location.href = appURL;
-                
-                // Show manual button after 2 seconds if app doesn't open
-                setTimeout(function() {
-                    document.getElementById('openButton').style.display = 'inline-block';
-                }, 2000);
-            }
-        };
-        
-        function openInApp() {
-            const fullURL = window.location.href;
-            const appURL = fullURL.replace('https://husofttech.com', 'meowkit://');
-            window.location.href = appURL;
+        #debug { 
+            margin-top: 20px; 
+            font-size: 12px; 
+            opacity: 0.7; 
+            word-break: break-all;
+            max-width: 100%;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
         }
-    </script>
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>🐱 MeowKit</h1>
-        <p>Opening MeowKit app...</p>
-        <p style="font-size: 14px; opacity: 0.7;">If the app doesn't open automatically:</p>
-        <a href="#" onclick="openInApp(); return false;" class="button" id="openButton" style="display:none;">
+        <p id="message">Opening MeowKit app...</p>
+        <button onclick="openInApp()" class="button" id="openButton" style="display:none;">
             Open in MeowKit App
-        </a>
+        </button>
+        <div id="debug"></div>
     </div>
+
+    <script>
+        function openInApp() {
+            // Get the FULL URL with all query parameters
+            const fullURL = window.location.href;
+            
+            // Convert https://husofttech.com to meowkit://husofttech.com
+            // Keep ALL query parameters (apiKey, oobCode, mode, lang)
+            const appURL = fullURL.replace('https://', 'meowkit://');
+            
+            console.log('Original URL:', fullURL);
+            console.log('App URL:', appURL);
+            
+            // Show debug info
+            document.getElementById('debug').innerHTML = 
+                '<strong>Debug Info:</strong><br>' +
+                'Original: ' + fullURL + '<br><br>' +
+                'App URL: ' + appURL;
+            
+            // Try to open the app
+            window.location.href = appURL;
+            
+            // Show manual button after 3 seconds if app doesn't open
+            setTimeout(function() {
+                document.getElementById('openButton').style.display = 'inline-block';
+                document.getElementById('message').textContent = 
+                    'If the app didn\'t open, tap the button below:';
+            }, 3000);
+        }
+        
+        // Auto-redirect on page load
+        window.onload = function() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isMac = /Macintosh/.test(navigator.userAgent);
+            
+            if (isIOS && !isMac) {
+                // Auto-open after 1 second
+                setTimeout(openInApp, 1000);
+            } else {
+                document.getElementById('message').textContent = 
+                    'Please open this link on your iPhone where MeowKit is installed.';
+                document.getElementById('openButton').style.display = 'inline-block';
+                document.getElementById('openButton').textContent = 
+                    'Download MeowKit from App Store';
+            }
+        };
+    </script>
 </body>
 </html>
