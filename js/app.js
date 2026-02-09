@@ -9,6 +9,7 @@ const appShort = document.getElementById("app-short");
 const appLong = document.getElementById("app-long");
 const appFeatures = document.getElementById("app-features");
 const appStore = document.getElementById("app-store");
+const appPolicies = document.getElementById("app-policies");
 const appLinks = document.getElementById("app-links");
 const appScreenshots = document.getElementById("app-screenshots");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -134,27 +135,11 @@ const renderApp = (app) => {
   appShort.textContent = app.shortDescription;
   appLong.textContent = app.longDescription;
   appStore.href = app.appStoreUrl;
+  appPolicies.href = app.privacyPolicyUrl;
 
   appFeatures.innerHTML = app.features
-    .map((feature) => `<li class="mb-2">${feature}</li>`)
+    .map((feature) => `<li>${feature}</li>`)
     .join("");
-
-  const links = [];
-  if (app.websiteUrl) {
-    links.push(`<a class="btn btn-outline-primary" href="${app.websiteUrl}" target="_blank" rel="noopener">Website</a>`);
-  }
-  if (app.privacyPolicyUrl) {
-    links.push(
-      `<a class="btn btn-outline-primary" href="${app.privacyPolicyUrl}" target="_blank" rel="noopener">Policies</a>`
-    );
-  }
-  if (app.supportEmail) {
-    links.push('<a class="btn btn-outline-primary" href="support.html">Support</a>');
-  }
-  if (links.length === 0) {
-    links.push('<p class="text-muted mb-0">No additional links provided.</p>');
-  }
-  appLinks.innerHTML = links.join("");
 
   appScreenshots.innerHTML = app.screenshots
     .map(

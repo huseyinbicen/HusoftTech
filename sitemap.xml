@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://husofttech.com/</loc>
   </url>
@@ -7,9 +5,23 @@
     <loc>https://husofttech.com/app.html?id=trip-checklist</loc>
   </url>
   <url>
-    <loc>https://husofttech.com/assets/apps/trip-checklist/policy/privacy.html</loc>
+    <loc>https://husofttech.com/app.html?id=meowkit</loc>
+  </url>
+  <url>
+    <loc>https://husofttech.com/assets/apps/trip-checklist/policy/index.html</loc>
+  </url>
+  <url>
+    <loc>https://husofttech.com/assets/apps/trip-checklist/policy/terms.html</loc>
+  </url>
+  <url>
+    <loc>https://husofttech.com/assets/apps/MeowKit/policy/index.html</loc>
+  </url>
+  <url>
+    <loc>https://husofttech.com/assets/apps/MeowKit/policy/privacy.html</loc>
+  </url>
+  <url>
+    <loc>https://husofttech.com/assets/apps/MeowKit/policy/terms.html</loc>
   </url>
   <url>
     <loc>https://husofttech.com/support.html</loc>
   </url>
-</urlset>
