@@ -145,7 +145,7 @@ const renderApp = (app) => {
   }
   if (app.privacyPolicyUrl) {
     links.push(
-      `<a class="btn btn-outline-primary" href="${app.privacyPolicyUrl}" target="_blank" rel="noopener">Privacy Policy</a>`
+      `<a class="btn btn-outline-primary" href="${app.privacyPolicyUrl}" target="_blank" rel="noopener">Policies</a>`
     );
   }
   if (app.supportEmail) {
