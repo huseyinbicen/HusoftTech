@@ -178,8 +178,7 @@
         }
 
         function openInApp() {
-            const fullURL = window.location.href;
-            const appURL = fullURL.replace('https://', appData.deepLinkScheme + '://');
+            const appURL = appData.deepLinkScheme + '://' + window.location.pathname.substring(1) + window.location.search;
             window.location.href = appURL;
             
             setTimeout(function() {
@@ -213,12 +212,12 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const isMac = /Macintosh/.test(navigator.userAgent);
             
-            if (isIOS && !isMac) {
+            if (isIOS || isMac) {
                 document.getElementById('message').innerHTML = '<span class="loading"></span>Opening ' + appData.name + '...';
                 setTimeout(openInApp, 1000);
             } else {
                 document.getElementById('message').textContent = 
-                    'Please open this link on your iPhone where ' + appData.name + ' is installed.';
+                    'Please open this link on your iPhone or iPad where ' + appData.name + ' is installed.';
                 document.getElementById('openButton').style.display = 'inline-block';
                 if (appData.appStoreUrl) {
                     document.getElementById('openButton').textContent = 'Download ' + appData.name;
