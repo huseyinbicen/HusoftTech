@@ -150,6 +150,10 @@ const renderApp = (app) => {
     `
     )
     .join("");
+  const hasScreenshots = Array.isArray(app.screenshots) && app.screenshots.length > 0;
+  if (appScreenshots.parentElement) {
+    appScreenshots.parentElement.classList.toggle("d-none", !hasScreenshots);
+  }
 
   const revealTargets = appContent.querySelectorAll(".row, .mt-5, .card");
   revealTargets.forEach((el) => el.classList.add("reveal"));
