@@ -1040,10 +1040,19 @@ function renderSummaryPanel(profile) {
 
 function renderActionRow(profile) {
   const isBusinessCard = profile.appMode === APP_MODES.BUSINESS_CARD;
-  const actions = createElement(
-    "div",
-    isBusinessCard ? "action-row" : "action-row action-row--utility"
-  );
+  const actions = createElement("div", isBusinessCard ? "action-row" : "action-row action-row--utility");
+
+  const shareButton = document.createElement("button");
+  shareButton.className = "action-button action-button--ghost";
+  shareButton.type = "button";
+  shareButton.dataset.action = "share-page";
+  shareButton.append(createDecorativeIcon("share", "action-icon"), document.createTextNode("Share"));
+
+  const copyButton = document.createElement("button");
+  copyButton.className = "action-button action-button--ghost";
+  copyButton.type = "button";
+  copyButton.dataset.action = "copy-page";
+  copyButton.append(createDecorativeIcon("copy", "action-icon"), document.createTextNode("Copy"));
 
   if (isBusinessCard) {
     const saveButton = document.createElement("button");
@@ -1055,21 +1064,15 @@ function renderActionRow(profile) {
       document.createTextNode("Save Contact")
     );
     actions.appendChild(saveButton);
+
+    const secondary = createElement("div", "action-row__secondary");
+    secondary.appendChild(shareButton);
+    secondary.appendChild(copyButton);
+    actions.appendChild(secondary);
+  } else {
+    actions.appendChild(shareButton);
+    actions.appendChild(copyButton);
   }
-
-  const shareButton = document.createElement("button");
-  shareButton.className = "action-button action-button--ghost";
-  shareButton.type = "button";
-  shareButton.dataset.action = "share-page";
-  shareButton.append(createDecorativeIcon("share", "action-icon"), document.createTextNode("Share"));
-  actions.appendChild(shareButton);
-
-  const copyButton = document.createElement("button");
-  copyButton.className = "action-button action-button--ghost";
-  copyButton.type = "button";
-  copyButton.dataset.action = "copy-page";
-  copyButton.append(createDecorativeIcon("copy", "action-icon"), document.createTextNode("Copy"));
-  actions.appendChild(copyButton);
 
   return actions;
 }
@@ -1111,41 +1114,188 @@ function renderSectionHeader(eyebrowText, titleText, copyTextValue) {
   return header;
 }
 
-function renderBusinessCardDetailGrid(items) {
-  const grid = createElement("div", "detail-grid");
+function formatCompactUrlDisplay(rawValue) {
+  const normalized = normalizeUrl(rawValue);
+  if (!normalized) return rawValue.trim();
 
-  items.forEach((item) => {
-    const card = createElement("article", "detail-card");
-    card.appendChild(createElement("p", "detail-card__label", item.label));
-    card.appendChild(createElement("p", "detail-card__value", item.value));
-    grid.appendChild(card);
-  });
+  try {
+    const url = new URL(normalized);
+    const host = url.hostname.replace(/^www\./, "");
+    const path = url.pathname && url.pathname !== "/" ? url.pathname.replace(/\/$/, "") : "";
+    return `${host}${path}`;
+  } catch (error) {
+    return rawValue.trim();
+  }
+}
 
-  return grid;
+function createBusinessCardContactRow({ label, value, href = "", icon = "globe" }) {
+  const isLink = Boolean(href);
+  const row = isLink ? document.createElement("a") : createElement("div");
+
+  row.className = isLink
+    ? "business-card__contact business-card__contact--link"
+    : "business-card__contact";
+
+  if (isLink) {
+    row.href = href;
+    row.setAttribute("aria-label", `${label}: ${value}`);
+
+    if (/^https?:/i.test(href)) {
+      row.target = "_blank";
+      row.rel = "noopener noreferrer";
+    }
+  }
+
+  const iconWrap = createElement("span", "business-card__contact-icon");
+  iconWrap.appendChild(createDecorativeIcon(icon, "business-card__contact-icon-glyph"));
+  row.appendChild(iconWrap);
+
+  const content = createElement("div", "business-card__contact-content");
+  content.appendChild(createElement("p", "business-card__contact-label", label));
+  content.appendChild(
+    createElement(
+      "p",
+      isLink
+        ? "business-card__contact-value business-card__contact-value--link"
+        : "business-card__contact-value",
+      value
+    )
+  );
+  row.appendChild(content);
+
+  if (isLink) {
+    row.appendChild(createDecorativeIcon("arrow", "business-card__contact-arrow"));
+  }
+
+  return row;
+}
+
+function renderBusinessCardCanvas(profile) {
+  const scene = createElement("div", "business-card-scene");
+  const card = createElement("article", "business-card");
+  card.setAttribute("aria-label", `${profile.title} business card`);
+
+  const top = createElement("div", "business-card__top");
+  const topCopy = createElement("div", "business-card__top-copy");
+  topCopy.appendChild(
+    createElement(
+      "p",
+      "business-card__eyebrow",
+      profile.contact?.company || "Digital Business Card"
+    )
+  );
+
+  const mark = createElement("div", "business-card__mark", getInitials(profile.title));
+  mark.setAttribute("aria-hidden", "true");
+  top.append(topCopy, mark);
+
+  const body = createElement("div", "business-card__body");
+  body.appendChild(createElement("h3", "business-card__name", profile.title));
+
+  const headline = buildBusinessHeadline(profile.contact?.jobTitle || "", profile.contact?.company || "");
+  if (headline) {
+    body.appendChild(createElement("p", "business-card__headline", headline));
+  }
+
+  if (profile.bio && profile.bio !== headline) {
+    body.appendChild(createElement("p", "business-card__note", profile.bio));
+  }
+
+  const contacts = createElement("div", "business-card__contacts");
+
+  if (profile.contact?.phone) {
+    contacts.appendChild(
+      createBusinessCardContactRow({
+        label: "Phone",
+        value: profile.contact.phone,
+        href: `tel:${profile.contact.phone}`,
+        icon: "phone",
+      })
+    );
+  }
+
+  if (profile.contact?.email) {
+    contacts.appendChild(
+      createBusinessCardContactRow({
+        label: "Email",
+        value: profile.contact.email,
+        href: `mailto:${profile.contact.email}`,
+        icon: "mail",
+      })
+    );
+  }
+
+  if (profile.contact?.website) {
+    contacts.appendChild(
+      createBusinessCardContactRow({
+        label: "Website",
+        value: formatCompactUrlDisplay(profile.contact.website),
+        href: profile.contact.website,
+        icon: "globe",
+      })
+    );
+  }
+
+  if (profile.contact?.linkedin) {
+    contacts.appendChild(
+      createBusinessCardContactRow({
+        label: "LinkedIn",
+        value: formatCompactUrlDisplay(profile.contact.linkedin),
+        href: profile.contact.linkedin,
+        icon: "linkedin",
+      })
+    );
+  }
+
+  if (!contacts.childElementCount && profile.contact?.detailItems?.length) {
+    profile.contact.detailItems.forEach((item) => {
+      contacts.appendChild(
+        createBusinessCardContactRow({
+          label: item.label,
+          value: item.value,
+        })
+      );
+    });
+  }
+
+  card.append(top, body, contacts);
+  scene.appendChild(card);
+  return scene;
 }
 
 function renderBusinessCardPanel(profile) {
   const content = createElement("section", "content-panel");
-  content.appendChild(
+  const stack = createElement("div", "business-card-stack");
+
+  stack.appendChild(
     renderSectionHeader(
       "Business Card",
-      "Quick contact",
-      "Use the actions below to call, email, open a site, or save this contact as a vCard."
+      "Digital contact card",
+      "Tap directly on the card to open links, call, or email. You can still save the contact as a vCard."
     )
   );
 
-  if (profile.contact?.detailItems?.length) {
-    content.appendChild(renderBusinessCardDetailGrid(profile.contact.detailItems));
+  stack.appendChild(renderBusinessCardCanvas(profile));
+
+  if (profile.links.length) {
+    stack.appendChild(
+      renderSectionHeader(
+        "Quick Actions",
+        "Open contact links",
+        "These match the contact destinations shown on the card, but in larger button form."
+      )
+    );
   }
 
-  content.appendChild(
+  stack.appendChild(
     renderLinkGrid(
       profile.links,
-      "No contact actions yet",
-      "Add phone, email, website, or LinkedIn parameters to show quick contact buttons."
+      "No contact links yet",
+      "Add phone, email, website, or LinkedIn parameters to show tappable links on the business card."
     )
   );
 
+  content.appendChild(stack);
   return content;
 }
 
