@@ -30,9 +30,12 @@ The homepage reads brand metadata from the inline JSON in `index.html`:
 
 - `index.html` - Homepage with the apps grid.
 - `app.html` - App detail page (single template).
+- `scanely/` - Static Scanely QR landing page for social hubs and business cards.
 - `css/styles.css` - Brand styling overrides and motion polish.
+- `css/scanely.css` - Styling for the Scanely QR landing page.
 - `js/main.js` - Loads the apps list from inline JSON.
 - `js/app.js` - Loads a single app by query param from inline JSON.
+- `js/scanely.js` - Query parser and renderer for Scanely social hub and business card pages.
 - `assets/` - Brand assets and app screenshots.
 
 ## Notes
