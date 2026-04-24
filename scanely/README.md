@@ -29,7 +29,7 @@ Use the `app` query parameter to choose the page type.
 | Social Hub | `SH` | Linktree-style list of social and custom links |
 | Business Card | `BC` | Contact card with quick actions and downloadable `.vcf` |
 
-If `app` is missing, Scanely defaults to the Social Hub flow for backward compatibility.
+The `app` parameter is required. Use `app=SH` for Social Hub or `app=BC` for Business Card.
 
 ## Shared Parameters
 
@@ -37,7 +37,7 @@ These work in both modes.
 
 | Purpose | Short | Long |
 |---|---|---|
-| App mode | `app` | `mode`, `type` |
+| App mode | `app` | `None` |
 | Avatar URL | `a` | `avatar`, `image`, `avatarUrl`, `imageUrl` |
 | Accent color | `ac` | `accent`, `accentColor`, `color` |
 | Pro mode | `pro` | `isPro`, `is_pro` |
@@ -46,6 +46,8 @@ These work in both modes.
 ## `isPro`
 
 `isPro` controls the Scanely brand badge.
+
+If `isPro` is omitted, it defaults to `false`.
 
 - `isPro=true`: hide the `Powered by Scanely` badge
 - `isPro=false`: show the badge in the top bar beside the light/dark toggle
@@ -73,13 +75,13 @@ Use `app=SH` for the current Linktree-style experience.
 Short QR-friendly example:
 
 ```text
-https://husofttech.com/scanely/?app=SH&t=My%20Links&b=Find%20me%20everywhere&ig=xxxuser&yt=%40xxxuser&web=https%3A%2F%2Fhusofttech.com&c1=https%3A%2F%2Fportfolio.example.com&c1l=Portfolio&ac=%230f766e&isPro=true
+https://husofttech.com/scanely/?app=SH&t=My%20Links&b=Find%20me%20everywhere&ig=xxxuser&yt=%40xxxuser&web=https%3A%2F%2Fhusofttech.com&c1=https%3A%2F%2Fportfolio.example.com&c1l=Portfolio&ac=%230f766e
 ```
 
 Readable example:
 
 ```text
-https://husofttech.com/scanely/?app=SH&title=My%20Links&bio=Find%20me%20everywhere&instagram=xxxuser&youtube=%40xxxuser&website=https%3A%2F%2Fhusofttech.com&custom1Url=https%3A%2F%2Fportfolio.example.com&custom1Label=Portfolio&accentColor=%230f766e&isPro=false
+https://husofttech.com/scanely/?app=SH&title=My%20Links&bio=Find%20me%20everywhere&instagram=xxxuser&youtube=%40xxxuser&website=https%3A%2F%2Fhusofttech.com&custom1Url=https%3A%2F%2Fportfolio.example.com&custom1Label=Portfolio&accentColor=%230f766e
 ```
 
 ### Main Social Hub Parameters
@@ -127,24 +129,49 @@ Every supported SVG logo has a short key and a long key.
 
 ### Social Value Rules
 
-- For username-based platforms, you can pass just the username.
-- Full URLs also work for most platforms.
-- For WhatsApp, a phone number is best.
-- For Discord, Spotify, LINE, Messenger, Signal, WeChat, and Viber, full URLs are recommended.
+- For most username-based platforms, you can pass either a plain username or a full URL.
+- For WhatsApp, a phone number is best, but a full WhatsApp URL also works.
+- Spotify accepts either a username like `sp=exampleuser` or a full Spotify profile URL.
+- WeChat accepts either a full share URL or a plain WeChat ID. When you pass only a WeChat ID, Scanely builds a best-effort mobile `weixin://` deep link.
+- Discord, LINE, Messenger, Signal, and Viber are still safest when you pass full URLs.
 - For Mastodon, use either a full URL or a handle like `@user@server.com`.
 
-Examples:
+### Social Value Samples
 
-```text
-?app=SH&ig=xxxuser
-?app=SH&yt=%40xxxuser
-?app=SH&wa=905551112233
-?app=SH&dc=https%3A%2F%2Fdiscord.gg%2Fexample
-?app=SH&md=%40husofttech%40mastodon.social
-?app=SH&web=https%3A%2F%2Fhusofttech.com
-```
+Use the sample values below after either the short key or the long key. Example: `?app=SH&ig=exampleuser` or `?app=SH&instagram=https://www.instagram.com/exampleuser/`.
+
+| Platform | Plain value sample | URL value sample |
+|---|---|---|
+| Instagram | `exampleuser` | `https://www.instagram.com/exampleuser/` |
+| TikTok | `exampleuser` | `https://www.tiktok.com/@exampleuser` |
+| X | `exampleuser` | `https://x.com/exampleuser` |
+| YouTube | `@exampleuser` | `https://www.youtube.com/@exampleuser` |
+| Threads | `exampleuser` | `https://www.threads.com/@exampleuser` |
+| Facebook | `exampleuser` | `https://www.facebook.com/exampleuser` |
+| GitHub | `exampleuser` | `https://github.com/exampleuser` |
+| Telegram | `exampleuser` | `https://t.me/exampleuser` |
+| WhatsApp | `905551112233` | `https://wa.me/905551112233` |
+| Snapchat | `exampleuser` | `https://www.snapchat.com/add/exampleuser` |
+| Reddit | `exampleuser` | `https://www.reddit.com/user/exampleuser/` |
+| Discord | `URL recommended` | `https://discord.gg/example` |
+| Spotify | `exampleuser` | `https://open.spotify.com/user/exampleuser` |
+| Pinterest | `exampleuser` | `https://www.pinterest.com/exampleuser/` |
+| Twitch | `exampleuser` | `https://www.twitch.tv/exampleuser` |
+| Bluesky | `example.bsky.social` | `https://bsky.app/profile/example.bsky.social` |
+| Mastodon | `@example@mastodon.social` | `https://mastodon.social/@example` |
+| LINE | `URL recommended` | `https://line.me/ti/p/example` |
+| Messenger | `URL recommended` | `https://m.me/exampleuser` |
+| Signal | `URL recommended` | `https://signal.me/#eu/example` |
+| WeChat | `examplewechatid` | `https://u.wechat.com/exampleShareToken` |
+| Viber | `URL recommended` | `https://invite.viber.com/?g2=AQexample` |
+| Tumblr | `exampleuser` | `https://exampleuser.tumblr.com/` |
+| Behance | `exampleuser` | `https://www.behance.net/exampleuser` |
+| Dribbble | `exampleuser` | `https://dribbble.com/exampleuser` |
+| Website | `example.com` | `https://example.com` |
 
 ### Custom Links
+
+These custom-link parameters work in both Social Hub mode and Business Card mode.
 
 Short format:
 
@@ -198,13 +225,13 @@ Use `app=BC` to show a contact-style page with quick actions and a downloadable 
 Short QR-friendly example:
 
 ```text
-https://husofttech.com/scanely/?app=BC&fn=Alex&ln=Carter&jt=iOS%20Designer&co=HusoftTech&ph=%2B905551112233&em=alex%40husofttech.com&web=https%3A%2F%2Fhusofttech.com&li=https%3A%2F%2Fwww.linkedin.com%2Fin%2Falexcarter&ac=%230f766e
+https://husofttech.com/scanely/?app=BC&fn=Alex&ln=Carter&jt=iOS%20Designer&co=HusoftTech&ph=%2B905551112233&em=alex%40husofttech.com&web=https%3A%2F%2Fhusofttech.com&li=https%3A%2F%2Fwww.linkedin.com%2Fin%2Falexcarter&c1=https%3A%2F%2Fportfolio.example.com&c1l=Portfolio&ac=%230f766e
 ```
 
 Readable example:
 
 ```text
-https://husofttech.com/scanely/?app=BC&firstName=Alex&lastName=Carter&jobTitle=iOS%20Designer&company=HusoftTech&phone=%2B905551112233&email=alex%40husofttech.com&website=https%3A%2F%2Fhusofttech.com&linkedin=https%3A%2F%2Fwww.linkedin.com%2Fin%2Falexcarter&accentColor=%230f766e
+https://husofttech.com/scanely/?app=BC&firstName=Alex&lastName=Carter&jobTitle=iOS%20Designer&company=HusoftTech&phone=%2B905551112233&email=alex%40husofttech.com&website=https%3A%2F%2Fhusofttech.com&linkedin=https%3A%2F%2Fwww.linkedin.com%2Fin%2Falexcarter&custom1Url=https%3A%2F%2Fportfolio.example.com&custom1Label=Portfolio&accentColor=%230f766e
 ```
 
 ### Business Card Parameters
@@ -227,6 +254,22 @@ Notes:
 - `title` is treated as the job title only in `app=BC` mode.
 - `web` is reused for the business website in `app=BC` mode.
 - `li` should be a full URL for the cleanest result.
+
+### Business Card Custom Links
+
+Business cards can also include extra named URLs such as Portfolio, Booking, Resume, or Store.
+
+- URL fields: `c1` to `c8` or `custom1Url` to `custom8Url`
+- Label fields: `c1l` to `c8l` or `custom1Label` to `custom8Label`
+- Optional icon hints: `c1i` to `c8i` or `custom1Icon` to `custom8Icon`
+
+Example:
+
+```text
+&c1=https%3A%2F%2Fportfolio.example.com&c1l=Portfolio&c2=https%3A%2F%2Fcal.example.com&c2l=Book%20a%20Call
+```
+
+These custom links are shown on the business card and in the larger quick-action list below it. They are not added to the generated `.vcf` file.
 
 ### vCard Mapping
 

@@ -58,7 +58,7 @@ const PLATFORM_DEFINITIONS = [
   { id: "snapchat", label: "Snapchat", icon: ICONS.snapchat, iconHex: "#fffc00", iconInk: "#111827", group: "social", keys: ["sc", "snapchat"], buildUrl: buildSimpleUserUrl("https://www.snapchat.com/add/"), display: formatHandleDisplay },
   { id: "reddit", label: "Reddit", icon: ICONS.reddit, iconHex: "#ff4500", iconInk: "#ffffff", group: "social", keys: ["rd", "reddit"], buildUrl: buildSimpleUserUrl("https://www.reddit.com/user/"), display: formatHandleDisplay },
   { id: "discord", label: "Discord", icon: ICONS.discord, iconHex: "#5865f2", iconInk: "#ffffff", group: "social", keys: ["dc", "discord"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "spotify", label: "Spotify", icon: ICONS.spotify, iconHex: "#1db954", iconInk: "#062714", group: "social", keys: ["sp", "spotify"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
+  { id: "spotify", label: "Spotify", icon: ICONS.spotify, iconHex: "#1db954", iconInk: "#062714", group: "social", keys: ["sp", "spotify"], buildUrl: buildSimpleUserUrl("https://open.spotify.com/user/"), display: formatIdentifierOrHostDisplay },
   { id: "pinterest", label: "Pinterest", icon: ICONS.pinterest, iconHex: "#e60023", iconInk: "#ffffff", group: "social", keys: ["pin", "pinterest"], buildUrl: buildSimpleUserUrl("https://www.pinterest.com/"), display: formatHandleDisplay },
   { id: "twitch", label: "Twitch", icon: ICONS.twitch, iconHex: "#9146ff", iconInk: "#ffffff", group: "social", keys: ["tw", "twitch"], buildUrl: buildSimpleUserUrl("https://www.twitch.tv/"), display: formatHandleDisplay },
   { id: "bluesky", label: "Bluesky", icon: ICONS.bluesky, iconHex: "#1185fe", iconInk: "#ffffff", group: "social", keys: ["bsky", "bluesky"], buildUrl: buildSimpleUserUrl("https://bsky.app/profile/"), display: formatBlueskyDisplay },
@@ -66,7 +66,7 @@ const PLATFORM_DEFINITIONS = [
   { id: "line", label: "LINE", icon: ICONS.line, iconHex: "#00c300", iconInk: "#ffffff", group: "social", keys: ["ln", "line"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
   { id: "messenger", label: "Messenger", icon: ICONS.messenger, iconHex: "#0084ff", iconInk: "#ffffff", group: "social", keys: ["msg", "messenger"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
   { id: "signal", label: "Signal", icon: ICONS.signal, iconHex: "#3a76f0", iconInk: "#ffffff", group: "social", keys: ["sg", "signal"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "wechat", label: "WeChat", icon: ICONS.wechat, iconHex: "#07c160", iconInk: "#ffffff", group: "social", keys: ["wc", "wechat"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
+  { id: "wechat", label: "WeChat", icon: ICONS.wechat, iconHex: "#07c160", iconInk: "#ffffff", group: "social", keys: ["wc", "wechat"], buildUrl: buildWeChatUrl, display: formatIdentifierOrHostDisplay },
   { id: "viber", label: "Viber", icon: ICONS.viber, iconHex: "#7360f2", iconInk: "#ffffff", group: "social", keys: ["vb", "viber"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
   { id: "tumblr", label: "Tumblr", icon: ICONS.tumblr, iconHex: "#36465d", iconInk: "#ffffff", group: "social", keys: ["tb", "tumblr"], buildUrl: buildTumblrUrl, display: formatHandleDisplay },
   { id: "behance", label: "Behance", icon: ICONS.behance, iconHex: "#1769ff", iconInk: "#ffffff", group: "social", keys: ["bh", "behance"], buildUrl: buildSimpleUserUrl("https://www.behance.net/"), display: formatHandleDisplay },
@@ -86,7 +86,7 @@ const APP_MODES = {
   BUSINESS_CARD: "BC",
 };
 
-const APP_MODE_KEYS = ["app", "mode", "type"];
+const APP_MODE_KEYS = ["app"];
 
 let activeAccentColor = DEFAULT_PROFILE.accent;
 
@@ -110,7 +110,12 @@ function clampText(value, maxLength) {
 }
 
 function getAppMode(params) {
-  const rawMode = getParamValue(params, APP_MODE_KEYS).toUpperCase();
+  const rawMode = getParamValue(params, APP_MODE_KEYS);
+  if (!rawMode) {
+    throw new Error("Missing required `app` parameter. Use `app=SH` or `app=BC`.");
+  }
+
+  const normalizedMode = rawMode.toUpperCase();
 
   if ([
     APP_MODES.BUSINESS_CARD,
@@ -119,11 +124,22 @@ function getAppMode(params) {
     "BUSINESS_CARD",
     "VCARD",
     "CONTACT",
-  ].includes(rawMode)) {
+  ].includes(normalizedMode)) {
     return APP_MODES.BUSINESS_CARD;
   }
 
-  return APP_MODES.SOCIAL_HUB;
+  if ([
+    APP_MODES.SOCIAL_HUB,
+    "SOCIALHUB",
+    "SOCIAL-HUB",
+    "SOCIAL_HUB",
+    "SOCIAL",
+    "LINKS",
+  ].includes(normalizedMode)) {
+    return APP_MODES.SOCIAL_HUB;
+  }
+
+  throw new Error("Invalid `app` parameter. Use `app=SH` or `app=BC`.");
 }
 
 function hasRenderableParams(params) {
@@ -329,6 +345,18 @@ function buildMastodonUrl(rawValue) {
   return `https://${match[2]}/@${match[1]}`;
 }
 
+function buildWeChatUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+
+  const identifier = sanitizeHandle(rawValue);
+  if (!identifier) return "";
+
+  // WeChat share URLs are the safest option, but a plain WeChat ID can still
+  // fall back to a mobile deep link when the app is installed.
+  return `weixin://dl/chat?${encodeURIComponent(identifier)}`;
+}
+
 function formatHandleDisplay(rawValue) {
   const handle = sanitizeHandle(rawValue);
   return handle ? `@${handle}` : "";
@@ -362,6 +390,14 @@ function formatMastodonDisplay(rawValue) {
   return rawValue.trim();
 }
 
+function formatIdentifierOrHostDisplay(rawValue) {
+  if (normalizeUrl(rawValue)) {
+    return formatHostDisplay(rawValue);
+  }
+
+  return sanitizeHandle(rawValue);
+}
+
 function formatHostDisplay(rawValue) {
   const normalized = normalizeUrl(rawValue);
   if (!normalized) return "";
@@ -375,6 +411,50 @@ function formatHostDisplay(rawValue) {
   } catch (error) {
     return rawValue.trim();
   }
+}
+
+function buildCustomLinks(
+  params,
+  {
+    group = "custom",
+    idPrefix = "custom",
+    defaultIcon = ICONS.website,
+    defaultIconHex = "#0f766e",
+    defaultIconInk = "#ffffff",
+  } = {}
+) {
+  const links = [];
+
+  for (let index = 1; index <= 8; index += 1) {
+    const href = normalizeUrl(
+      getParamValue(params, [`c${index}`, `c${index}u`, `custom${index}_url`, `custom${index}Url`])
+    );
+    if (!href) continue;
+
+    const label = clampText(
+      getParamValue(params, [`c${index}l`, `custom${index}_label`, `custom${index}Label`]) || `Custom Link ${index}`,
+      40
+    );
+
+    const iconHint = sanitizeHandle(
+      getParamValue(params, [`c${index}i`, `custom${index}_icon`, `custom${index}Icon`])
+    ).toLowerCase();
+    const customPlatform = resolveCustomPlatform(iconHint);
+
+    links.push({
+      id: `${idPrefix}-${index}`,
+      label,
+      caption: formatHostDisplay(href),
+      href,
+      icon: customPlatform?.icon || defaultIcon,
+      iconHex: customPlatform?.iconHex || defaultIconHex,
+      iconInk: customPlatform?.iconInk || defaultIconInk,
+      group,
+      isCustom: true,
+    });
+  }
+
+  return links;
 }
 
 function buildProfileLinks(params) {
@@ -404,35 +484,7 @@ function buildProfileLinks(params) {
     });
   }
 
-  for (let index = 1; index <= 8; index += 1) {
-    const href = normalizeUrl(
-      getParamValue(params, [`c${index}`, `c${index}u`, `custom${index}_url`, `custom${index}Url`])
-    );
-    if (!href) continue;
-
-    const label = clampText(
-      getParamValue(params, [`c${index}l`, `custom${index}_label`, `custom${index}Label`]) || `Custom Link ${index}`,
-      40
-    );
-
-    const iconHint = sanitizeHandle(
-      getParamValue(params, [`c${index}i`, `custom${index}_icon`, `custom${index}Icon`])
-    ).toLowerCase();
-    const customPlatform = resolveCustomPlatform(iconHint);
-
-    links.push({
-      id: `custom-${index}`,
-      label,
-      caption: formatHostDisplay(href),
-      href,
-      icon: customPlatform?.icon || ICONS.website,
-      iconHex: customPlatform?.iconHex || "#0f766e",
-      iconInk: customPlatform?.iconInk || "#ffffff",
-      group: "custom",
-      isCustom: true,
-    });
-  }
-
+  links.push(...buildCustomLinks(params));
   return links;
 }
 
@@ -502,7 +554,7 @@ function buildVCardText(contact) {
   return `${lines.join("\r\n")}\r\n`;
 }
 
-function buildBusinessCardLinks(contact) {
+function buildBusinessCardLinks(contact, params = new URLSearchParams()) {
   const links = [];
 
   if (contact.phone) {
@@ -560,6 +612,16 @@ function buildBusinessCardLinks(contact) {
       isCustom: false,
     });
   }
+
+  links.push(
+    ...buildCustomLinks(params, {
+      group: "custom",
+      idPrefix: "contact-custom",
+      defaultIcon: ICONS.website,
+      defaultIconHex: "#0f766e",
+      defaultIconInk: "#ffffff",
+    })
+  );
 
   return links;
 }
@@ -623,7 +685,7 @@ function buildBusinessCardConfig(params) {
     title: displayName,
     bio: clampText(getParamValue(params, ["b", "bio", "subtitle", "description", "note"]), 180)
       || buildBusinessHeadline(jobTitle, company),
-    links: buildBusinessCardLinks(contact),
+    links: buildBusinessCardLinks(contact, params),
     contact: {
       ...contact,
       detailItems: buildBusinessCardDetailItems(contact),
@@ -648,6 +710,9 @@ function buildProfileConfig() {
 
 function buildPreviewConfig(appMode = APP_MODES.SOCIAL_HUB, params = new URLSearchParams()) {
   if (appMode === APP_MODES.BUSINESS_CARD) {
+    const previewParams = new URLSearchParams(
+      "c1=https%3A%2F%2Fportfolio.example.com&c1l=Portfolio&c2=https%3A%2F%2Fcal.example.com&c2l=Book%20a%20Call"
+    );
     const previewContact = {
       displayName: "Alex Carter",
       firstName: "Alex",
@@ -665,7 +730,7 @@ function buildPreviewConfig(appMode = APP_MODES.SOCIAL_HUB, params = new URLSear
       mode: "preview",
       title: previewContact.displayName,
       bio: buildBusinessHeadline(previewContact.jobTitle, previewContact.company),
-      links: buildBusinessCardLinks(previewContact),
+      links: buildBusinessCardLinks(previewContact, previewParams),
       contact: {
         ...previewContact,
         detailItems: buildBusinessCardDetailItems(previewContact),
@@ -1247,6 +1312,19 @@ function renderBusinessCardCanvas(profile) {
     );
   }
 
+  profile.links
+    .filter((link) => link.isCustom)
+    .forEach((link) => {
+      contacts.appendChild(
+        createBusinessCardContactRow({
+          label: link.label,
+          value: link.caption || formatCompactUrlDisplay(link.href),
+          href: link.href,
+          icon: "globe",
+        })
+      );
+    });
+
   if (!contacts.childElementCount && profile.contact?.detailItems?.length) {
     profile.contact.detailItems.forEach((item) => {
       contacts.appendChild(
@@ -1282,7 +1360,7 @@ function renderBusinessCardPanel(profile) {
       renderSectionHeader(
         "Quick Actions",
         "Open contact links",
-        "These match the contact destinations shown on the card, but in larger button form."
+        "These include the main contact destinations plus any custom URLs you add, but in larger button form."
       )
     );
   }
@@ -1291,7 +1369,7 @@ function renderBusinessCardPanel(profile) {
     renderLinkGrid(
       profile.links,
       "No contact links yet",
-      "Add phone, email, website, or LinkedIn parameters to show tappable links on the business card."
+      "Add phone, email, website, LinkedIn, or custom link parameters to show tappable links on the business card."
     )
   );
 
@@ -1579,7 +1657,7 @@ function setBusyState(isBusy) {
   scanelyRoot.setAttribute("aria-busy", isBusy ? "true" : "false");
 }
 
-function renderRuntimeState() {
+function renderRuntimeState(message = "") {
   if (!scanelyRoot) return;
 
   const wrapper = createElement("section", "runtime-state");
@@ -1590,7 +1668,7 @@ function renderRuntimeState() {
     createElement(
       "p",
       "runtime-state__copy",
-      "Please refresh the page or check the QR link parameters. If the issue continues, regenerate the QR code and try again."
+      message || "Please refresh the page or check the QR link parameters. If the issue continues, regenerate the QR code and try again."
     )
   );
 
@@ -1691,7 +1769,7 @@ function initScanelyPage() {
     watchSystemThemeChanges();
   } catch (error) {
     console.error("Scanely page failed to initialize.", error);
-    renderRuntimeState();
+    renderRuntimeState(error instanceof Error ? error.message : "");
     setBusyState(false);
   }
 }
