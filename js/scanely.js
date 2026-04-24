@@ -46,32 +46,32 @@ const ICONS = {
 };
 
 const PLATFORM_DEFINITIONS = [
-  { id: "instagram", label: "Instagram", icon: ICONS.instagram, iconHex: "#e4405f", iconInk: "#ffffff", group: "social", keys: ["ig", "instagram"], buildUrl: buildSimpleUserUrl("https://www.instagram.com/"), display: formatHandleDisplay },
-  { id: "tiktok", label: "TikTok", icon: ICONS.tiktok, iconHex: "#25f4ee", iconInk: "#05181d", group: "social", keys: ["tt", "tiktok"], buildUrl: buildSimpleUserUrl("https://www.tiktok.com/@"), display: formatHandleDisplay },
-  { id: "x", label: "X", icon: ICONS.x, iconHex: "#0f172a", iconInk: "#ffffff", group: "social", keys: ["x", "twitter"], buildUrl: buildSimpleUserUrl("https://x.com/"), display: formatHandleDisplay },
-  { id: "youtube", label: "YouTube", icon: ICONS.youtube, iconHex: "#ff0033", iconInk: "#ffffff", group: "social", keys: ["yt", "youtube"], buildUrl: buildYouTubeUrl, display: formatYouTubeDisplay },
-  { id: "threads", label: "Threads", icon: ICONS.threads, iconHex: "#1f2937", iconInk: "#ffffff", group: "social", keys: ["th", "threads"], buildUrl: buildThreadsUrl, display: formatHandleDisplay },
-  { id: "facebook", label: "Facebook", icon: ICONS.facebook, iconHex: "#1877f2", iconInk: "#ffffff", group: "social", keys: ["fb", "facebook"], buildUrl: buildSimpleUserUrl("https://www.facebook.com/"), display: formatHandleDisplay },
-  { id: "github", label: "GitHub", icon: ICONS.github, iconHex: "#24292f", iconInk: "#ffffff", group: "social", keys: ["gh", "github"], buildUrl: buildSimpleUserUrl("https://github.com/"), display: formatHandleDisplay },
-  { id: "telegram", label: "Telegram", icon: ICONS.telegram, iconHex: "#26a5e4", iconInk: "#ffffff", group: "social", keys: ["tg", "telegram"], buildUrl: buildSimpleUserUrl("https://t.me/"), display: formatHandleDisplay },
-  { id: "whatsapp", label: "WhatsApp", icon: ICONS.whatsapp, iconHex: "#25d366", iconInk: "#ffffff", group: "social", keys: ["wa", "whatsapp"], buildUrl: buildWhatsAppUrl, display: formatPhoneDisplay },
-  { id: "snapchat", label: "Snapchat", icon: ICONS.snapchat, iconHex: "#fffc00", iconInk: "#111827", group: "social", keys: ["sc", "snapchat"], buildUrl: buildSimpleUserUrl("https://www.snapchat.com/add/"), display: formatHandleDisplay },
-  { id: "reddit", label: "Reddit", icon: ICONS.reddit, iconHex: "#ff4500", iconInk: "#ffffff", group: "social", keys: ["rd", "reddit"], buildUrl: buildSimpleUserUrl("https://www.reddit.com/user/"), display: formatHandleDisplay },
-  { id: "discord", label: "Discord", icon: ICONS.discord, iconHex: "#5865f2", iconInk: "#ffffff", group: "social", keys: ["dc", "discord"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "spotify", label: "Spotify", icon: ICONS.spotify, iconHex: "#1db954", iconInk: "#062714", group: "social", keys: ["sp", "spotify"], buildUrl: buildSimpleUserUrl("https://open.spotify.com/user/"), display: formatIdentifierOrHostDisplay },
-  { id: "pinterest", label: "Pinterest", icon: ICONS.pinterest, iconHex: "#e60023", iconInk: "#ffffff", group: "social", keys: ["pin", "pinterest"], buildUrl: buildSimpleUserUrl("https://www.pinterest.com/"), display: formatHandleDisplay },
-  { id: "twitch", label: "Twitch", icon: ICONS.twitch, iconHex: "#9146ff", iconInk: "#ffffff", group: "social", keys: ["tw", "twitch"], buildUrl: buildSimpleUserUrl("https://www.twitch.tv/"), display: formatHandleDisplay },
-  { id: "bluesky", label: "Bluesky", icon: ICONS.bluesky, iconHex: "#1185fe", iconInk: "#ffffff", group: "social", keys: ["bsky", "bluesky"], buildUrl: buildSimpleUserUrl("https://bsky.app/profile/"), display: formatBlueskyDisplay },
-  { id: "mastodon", label: "Mastodon", icon: ICONS.mastodon, iconHex: "#6364ff", iconInk: "#ffffff", group: "social", keys: ["md", "mastodon"], buildUrl: buildMastodonUrl, display: formatMastodonDisplay },
-  { id: "line", label: "LINE", icon: ICONS.line, iconHex: "#00c300", iconInk: "#ffffff", group: "social", keys: ["ln", "line"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "messenger", label: "Messenger", icon: ICONS.messenger, iconHex: "#0084ff", iconInk: "#ffffff", group: "social", keys: ["msg", "messenger"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "signal", label: "Signal", icon: ICONS.signal, iconHex: "#3a76f0", iconInk: "#ffffff", group: "social", keys: ["sg", "signal"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "wechat", label: "WeChat", icon: ICONS.wechat, iconHex: "#07c160", iconInk: "#ffffff", group: "social", keys: ["wc", "wechat"], buildUrl: buildWeChatUrl, display: formatIdentifierOrHostDisplay },
-  { id: "viber", label: "Viber", icon: ICONS.viber, iconHex: "#7360f2", iconInk: "#ffffff", group: "social", keys: ["vb", "viber"], buildUrl: buildDirectUrlOnly, display: formatHostDisplay },
-  { id: "tumblr", label: "Tumblr", icon: ICONS.tumblr, iconHex: "#36465d", iconInk: "#ffffff", group: "social", keys: ["tb", "tumblr"], buildUrl: buildTumblrUrl, display: formatHandleDisplay },
-  { id: "behance", label: "Behance", icon: ICONS.behance, iconHex: "#1769ff", iconInk: "#ffffff", group: "social", keys: ["bh", "behance"], buildUrl: buildSimpleUserUrl("https://www.behance.net/"), display: formatHandleDisplay },
-  { id: "dribbble", label: "Dribbble", icon: ICONS.dribbble, iconHex: "#ea4c89", iconInk: "#ffffff", group: "social", keys: ["db", "dribbble"], buildUrl: buildSimpleUserUrl("https://dribbble.com/"), display: formatHandleDisplay },
-  { id: "website", label: "Website", icon: ICONS.website, iconHex: "#0f766e", iconInk: "#ffffff", group: "custom", keys: ["web", "website"], buildUrl: buildFlexibleUrl, display: formatHostDisplay },
+  { id: "instagram", label: "Instagram", icon: ICONS.instagram, iconHex: "#e4405f", iconInk: "#ffffff", group: "social", keys: ["ig", "instagram"], domains: ["instagram.com"], buildUrl: buildSimpleUserUrl("https://www.instagram.com/"), display: formatHandleDisplay },
+  { id: "tiktok", label: "TikTok", icon: ICONS.tiktok, iconHex: "#25f4ee", iconInk: "#05181d", group: "social", keys: ["tt", "tiktok"], domains: ["tiktok.com"], buildUrl: buildSimpleUserUrl("https://www.tiktok.com/@"), display: formatHandleDisplay },
+  { id: "x", label: "X", icon: ICONS.x, iconHex: "#0f172a", iconInk: "#ffffff", group: "social", keys: ["x", "twitter"], domains: ["x.com", "twitter.com"], buildUrl: buildSimpleUserUrl("https://x.com/"), display: formatHandleDisplay },
+  { id: "youtube", label: "YouTube", icon: ICONS.youtube, iconHex: "#ff0033", iconInk: "#ffffff", group: "social", keys: ["yt", "youtube"], domains: ["youtube.com", "youtu.be"], buildUrl: buildYouTubeUrl, display: formatYouTubeDisplay },
+  { id: "threads", label: "Threads", icon: ICONS.threads, iconHex: "#1f2937", iconInk: "#ffffff", group: "social", keys: ["th", "threads"], domains: ["threads.com", "threads.net"], buildUrl: buildThreadsUrl, display: formatHandleDisplay },
+  { id: "facebook", label: "Facebook", icon: ICONS.facebook, iconHex: "#1877f2", iconInk: "#ffffff", group: "social", keys: ["fb", "facebook"], domains: ["facebook.com", "fb.com", "fb.me"], buildUrl: buildSimpleUserUrl("https://www.facebook.com/"), display: formatHandleDisplay },
+  { id: "github", label: "GitHub", icon: ICONS.github, iconHex: "#24292f", iconInk: "#ffffff", group: "social", keys: ["gh", "github"], domains: ["github.com", "gist.github.com"], buildUrl: buildSimpleUserUrl("https://github.com/"), display: formatHandleDisplay },
+  { id: "telegram", label: "Telegram", icon: ICONS.telegram, iconHex: "#26a5e4", iconInk: "#ffffff", group: "social", keys: ["tg", "telegram"], domains: ["t.me", "telegram.me", "telegram.org"], buildUrl: buildSimpleUserUrl("https://t.me/"), display: formatHandleDisplay },
+  { id: "whatsapp", label: "WhatsApp", icon: ICONS.whatsapp, iconHex: "#25d366", iconInk: "#ffffff", group: "social", keys: ["wa", "whatsapp"], domains: ["wa.me", "whatsapp.com"], buildUrl: buildWhatsAppUrl, display: formatPhoneDisplay },
+  { id: "snapchat", label: "Snapchat", icon: ICONS.snapchat, iconHex: "#fffc00", iconInk: "#111827", group: "social", keys: ["sc", "snapchat"], domains: ["snapchat.com"], buildUrl: buildSimpleUserUrl("https://www.snapchat.com/add/"), display: formatHandleDisplay },
+  { id: "reddit", label: "Reddit", icon: ICONS.reddit, iconHex: "#ff4500", iconInk: "#ffffff", group: "social", keys: ["rd", "reddit"], domains: ["reddit.com"], buildUrl: buildSimpleUserUrl("https://www.reddit.com/user/"), display: formatHandleDisplay },
+  { id: "discord", label: "Discord", icon: ICONS.discord, iconHex: "#5865f2", iconInk: "#ffffff", group: "social", keys: ["dc", "discord"], domains: ["discord.gg", "discord.com"], buildUrl: buildDiscordUrl, display: formatIdentifierOrHostDisplay },
+  { id: "spotify", label: "Spotify", icon: ICONS.spotify, iconHex: "#1db954", iconInk: "#062714", group: "social", keys: ["sp", "spotify"], domains: ["spotify.com"], buildUrl: buildSimpleUserUrl("https://open.spotify.com/user/"), display: formatIdentifierOrHostDisplay },
+  { id: "pinterest", label: "Pinterest", icon: ICONS.pinterest, iconHex: "#e60023", iconInk: "#ffffff", group: "social", keys: ["pin", "pinterest"], domains: ["pinterest.com", "pin.it"], buildUrl: buildSimpleUserUrl("https://www.pinterest.com/"), display: formatHandleDisplay },
+  { id: "twitch", label: "Twitch", icon: ICONS.twitch, iconHex: "#9146ff", iconInk: "#ffffff", group: "social", keys: ["tw", "twitch"], domains: ["twitch.tv"], buildUrl: buildSimpleUserUrl("https://www.twitch.tv/"), display: formatHandleDisplay },
+  { id: "bluesky", label: "Bluesky", icon: ICONS.bluesky, iconHex: "#1185fe", iconInk: "#ffffff", group: "social", keys: ["bsky", "bluesky"], domains: ["bsky.app"], buildUrl: buildSimpleUserUrl("https://bsky.app/profile/"), display: formatBlueskyDisplay },
+  { id: "mastodon", label: "Mastodon", icon: ICONS.mastodon, iconHex: "#6364ff", iconInk: "#ffffff", group: "social", keys: ["md", "mastodon"], domains: ["mastodon.social", "mastodon.online", "fosstodon.org", "hachyderm.io"], buildUrl: buildMastodonUrl, display: formatMastodonDisplay },
+  { id: "line", label: "LINE", icon: ICONS.line, iconHex: "#00c300", iconInk: "#ffffff", group: "social", keys: ["ln", "line"], domains: ["line.me"], buildUrl: buildLineUrl, display: formatIdentifierOrHostDisplay },
+  { id: "messenger", label: "Messenger", icon: ICONS.messenger, iconHex: "#0084ff", iconInk: "#ffffff", group: "social", keys: ["msg", "messenger"], domains: ["m.me", "messenger.com"], buildUrl: buildMessengerUrl, display: formatIdentifierOrHostDisplay },
+  { id: "signal", label: "Signal", icon: ICONS.signal, iconHex: "#3a76f0", iconInk: "#ffffff", group: "social", keys: ["sg", "signal"], domains: ["signal.me", "signal.group"], buildUrl: buildSignalUrl, display: formatIdentifierOrHostDisplay },
+  { id: "wechat", label: "WeChat", icon: ICONS.wechat, iconHex: "#07c160", iconInk: "#ffffff", group: "social", keys: ["wc", "wechat"], domains: ["u.wechat.com", "weixin.qq.com"], buildUrl: buildWeChatUrl, display: formatIdentifierOrHostDisplay },
+  { id: "viber", label: "Viber", icon: ICONS.viber, iconHex: "#7360f2", iconInk: "#ffffff", group: "social", keys: ["vb", "viber"], domains: ["viber.com"], buildUrl: buildViberUrl, display: formatIdentifierOrHostDisplay },
+  { id: "tumblr", label: "Tumblr", icon: ICONS.tumblr, iconHex: "#36465d", iconInk: "#ffffff", group: "social", keys: ["tb", "tumblr"], domains: ["tumblr.com"], buildUrl: buildTumblrUrl, display: formatHandleDisplay },
+  { id: "behance", label: "Behance", icon: ICONS.behance, iconHex: "#1769ff", iconInk: "#ffffff", group: "social", keys: ["bh", "behance"], domains: ["behance.net"], buildUrl: buildSimpleUserUrl("https://www.behance.net/"), display: formatHandleDisplay },
+  { id: "dribbble", label: "Dribbble", icon: ICONS.dribbble, iconHex: "#ea4c89", iconInk: "#ffffff", group: "social", keys: ["db", "dribbble"], domains: ["dribbble.com"], buildUrl: buildSimpleUserUrl("https://dribbble.com/"), display: formatHandleDisplay },
+  { id: "website", label: "Website", icon: ICONS.website, iconHex: "#0f766e", iconInk: "#ffffff", group: "custom", keys: ["web", "website"], domains: [], buildUrl: buildFlexibleUrl, display: formatHostDisplay },
 ];
 
 const DEFAULT_PROFILE = {
@@ -280,6 +280,46 @@ function buildFlexibleUrl(rawValue) {
   return normalizeUrl(rawValue);
 }
 
+function buildDiscordUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+  const code = sanitizeHandle(rawValue);
+  if (!code) return "";
+  return `https://discord.gg/${code}`;
+}
+
+function buildMessengerUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+  const handle = sanitizeHandle(rawValue);
+  if (!handle) return "";
+  return `https://m.me/${handle}`;
+}
+
+function buildLineUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+  const handle = sanitizeHandle(rawValue);
+  if (!handle) return "";
+  return `https://line.me/ti/p/${handle}`;
+}
+
+function buildSignalUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+  const handle = sanitizeHandle(rawValue);
+  if (!handle) return "";
+  return `https://signal.me/#eu/${handle}`;
+}
+
+function buildViberUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+  const code = sanitizeHandle(rawValue);
+  if (!code) return "";
+  return `https://invite.viber.com/?g2=${encodeURIComponent(code)}`;
+}
+
 function buildSimpleUserUrl(baseUrl) {
   return (rawValue) => {
     const directUrl = normalizeUrl(rawValue);
@@ -439,7 +479,7 @@ function buildCustomLinks(
     const iconHint = sanitizeHandle(
       getParamValue(params, [`c${index}i`, `custom${index}_icon`, `custom${index}Icon`])
     ).toLowerCase();
-    const customPlatform = resolveCustomPlatform(iconHint);
+    const customPlatform = resolveCustomPlatform(iconHint) || resolvePlatformFromUrl(href);
 
     links.push({
       id: `${idPrefix}-${index}`,
@@ -494,6 +534,23 @@ function resolveCustomPlatform(iconHint) {
   return PLATFORM_DEFINITIONS.find(
     (item) => item.id === iconHint || item.keys.includes(iconHint)
   );
+}
+
+function resolvePlatformFromUrl(href) {
+  if (!href) return null;
+
+  let hostname;
+  try {
+    hostname = new URL(href).hostname.toLowerCase().replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+
+  return PLATFORM_DEFINITIONS.find((platform) =>
+    platform.domains?.some(
+      (domain) => hostname === domain || hostname.endsWith(`.${domain}`)
+    )
+  ) ?? null;
 }
 
 function composeDisplayName(firstName, lastName, fullName = "") {
