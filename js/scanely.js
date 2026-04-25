@@ -774,12 +774,61 @@ function buildBusinessCardLinks(contact, params = new URLSearchParams()) {
 
 function buildPaymentHubLinks(params) {
   const links = [];
+  const signatures = new Set();
 
-  const paypalRaw = getParamValue(params, ["pp", "paypal", "paypalUrl", "paypal_url"]);
-  const paypalHref = buildPayPalUrl(paypalRaw);
-  if (paypalHref) {
-    links.push({
-      id: "paypal",
+  const pushLink = (link) => {
+    if (!link?.href) return;
+    const signature = [link.label || "", link.href || "", link.caption || ""].join("|");
+    if (signatures.has(signature)) return;
+    signatures.add(signature);
+    links.push(link);
+  };
+
+  const getPaymentOnlineFieldKeys = (field, index = 0) => {
+    const suffix = index > 0 ? String(index) : "";
+
+    if (field === "paypal") {
+      return index > 0
+        ? [`pp${suffix}`, `paypal${suffix}`, `paypalUrl${suffix}`, `paypal_url${suffix}`]
+        : ["pp", "paypal", "paypalUrl", "paypal_url"];
+    }
+
+    if (field === "paymentLink") {
+      return index > 0
+        ? [
+            `pl${suffix}`,
+            `paymentLink${suffix}`,
+            `payment_link${suffix}`,
+            `payLink${suffix}`,
+            `pay_link${suffix}`,
+            `checkout${suffix}`,
+            `checkoutUrl${suffix}`,
+          ]
+        : ["pl", "paymentLink", "payment_link", "payLink", "pay_link", "checkout", "checkoutUrl"];
+    }
+
+    if (field === "paymentLinkLabel") {
+      return index > 0
+        ? [
+            `pll${suffix}`,
+            `paymentLinkLabel${suffix}`,
+            `payment_link_label${suffix}`,
+            `payLabel${suffix}`,
+            `pay_label${suffix}`,
+          ]
+        : ["pll", "paymentLinkLabel", "payment_link_label", "payLabel", "pay_label"];
+    }
+
+    return [];
+  };
+
+  const buildPayPalLink = (index = 0) => {
+    const paypalRaw = getParamValue(params, getPaymentOnlineFieldKeys("paypal", index));
+    const paypalHref = buildPayPalUrl(paypalRaw);
+    if (!paypalHref) return null;
+
+    return {
+      id: index > 0 ? `paypal-${index}` : "paypal",
       label: "PayPal",
       caption: formatPayPalDisplay(paypalRaw) || "paypal.me",
       href: paypalHref,
@@ -788,17 +837,19 @@ function buildPaymentHubLinks(params) {
       iconInk: "#ffffff",
       group: "online",
       isCustom: false,
-    });
-  }
+    };
+  };
 
-  const paymentLink = normalizeUrl(
-    getParamValue(params, ["pl", "paymentLink", "payment_link", "payLink", "pay_link", "checkout", "checkoutUrl"])
-  );
-  if (paymentLink) {
-    links.push({
-      id: "payment-link",
+  const buildPaymentLink = (index = 0) => {
+    const paymentLink = normalizeUrl(
+      getParamValue(params, getPaymentOnlineFieldKeys("paymentLink", index))
+    );
+    if (!paymentLink) return null;
+
+    return {
+      id: index > 0 ? `payment-link-${index}` : "payment-link",
       label: clampText(
-        getParamValue(params, ["pll", "paymentLinkLabel", "payment_link_label", "payLabel", "pay_label"]),
+        getParamValue(params, getPaymentOnlineFieldKeys("paymentLinkLabel", index)),
         32
       ) || "Payment Link",
       caption: formatCompactUrlDisplay(paymentLink),
@@ -808,7 +859,15 @@ function buildPaymentHubLinks(params) {
       iconInk: "#ffffff",
       group: "online",
       isCustom: false,
-    });
+    };
+  };
+
+  pushLink(buildPayPalLink(0));
+  pushLink(buildPaymentLink(0));
+
+  for (let index = 1; index <= 8; index += 1) {
+    pushLink(buildPayPalLink(index));
+    pushLink(buildPaymentLink(index));
   }
 
   return links;
@@ -816,21 +875,43 @@ function buildPaymentHubLinks(params) {
 
 function buildCryptoWallets(params) {
   const wallets = [];
+  const signatures = new Set();
+
+  const withSuffix = (keys = [], index = 0) => {
+    if (index === 0) return keys;
+    return keys.map((key) => `${key}${index}`);
+  };
+
+  const pushWallet = (wallet) => {
+    if (!wallet?.address) return;
+    const signature = [wallet.id, wallet.address, wallet.network || ""].join("|");
+    if (signatures.has(signature)) return;
+    signatures.add(signature);
+    wallets.push(wallet);
+  };
 
   PAYMENT_WALLET_DEFINITIONS.forEach((wallet) => {
-    const address = normalizeWalletAddress(getParamValue(params, wallet.keys));
-    if (!address) return;
+    const buildWalletEntry = (index = 0) => {
+      const address = normalizeWalletAddress(getParamValue(params, withSuffix(wallet.keys, index)));
+      if (!address) return null;
 
-    wallets.push({
-      id: wallet.id,
-      label: wallet.label,
-      symbol: wallet.symbol,
-      address,
-      network: clampText(getParamValue(params, wallet.networkKeys), 24),
-      iconHex: wallet.iconHex,
-      iconInk: wallet.iconInk,
-      feedbackMessage: `${wallet.symbol} address copied.`,
-    });
+      return {
+        id: index > 0 ? `${wallet.id}-${index}` : wallet.id,
+        label: wallet.label,
+        symbol: wallet.symbol,
+        address,
+        network: clampText(getParamValue(params, withSuffix(wallet.networkKeys, index)), 24),
+        iconHex: wallet.iconHex,
+        iconInk: wallet.iconInk,
+        feedbackMessage: `${wallet.symbol} address copied.`,
+      };
+    };
+
+    pushWallet(buildWalletEntry(0));
+
+    for (let index = 1; index <= 8; index += 1) {
+      pushWallet(buildWalletEntry(index));
+    }
   });
 
   return wallets;
@@ -1114,7 +1195,7 @@ function buildProfileConfig() {
 function buildPreviewConfig(appMode = APP_MODES.SOCIAL_HUB, params = new URLSearchParams()) {
   if (appMode === APP_MODES.PAYMENT_HUB) {
     const previewParams = new URLSearchParams(
-      "bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987&pp=husofttech&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&pll=Checkout&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&sol=9xQeWvG816bUx9EPmexampleSolanaWallet&bnb=0x6F46CF5569aefa1Acc1009290c8E043747172d89"
+      "bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987&pp=husofttech&pp1=husofttech.global&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&pll=Checkout&pl1=https%3A%2F%2Fexample.com%2Finvoice%2F4587&pll1=Invoice&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&btc1=bc1q8example9secondarywallet0z7k2n3m4p5q6r7s8t&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&eth1=0x1111111254EEB25477B68fb85Ed929f73A960582&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&usdt1=0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&usdtn1=ERC20&sol=9xQeWvG816bUx9EPmexampleSolanaWallet&bnb=0x6F46CF5569aefa1Acc1009290c8E043747172d89"
     );
     const bankAccounts = buildPaymentBankAccounts(previewParams);
     const cryptoWallets = buildCryptoWallets(previewParams);

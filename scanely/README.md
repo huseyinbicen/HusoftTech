@@ -305,13 +305,13 @@ Use `app=PH` to show a payment-first landing page with bank transfer details, di
 Short QR-friendly example:
 
 ```text
-https://husofttech.com/scanely/?app=PH&t=HusoftTech%20Payments&b=Choose%20the%20best%20way%20to%20pay&bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987&pp=husofttech&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&sol=9xQeWvG816bUx9EPmexampleSolanaWallet&ac=%230f766e
+https://husofttech.com/scanely/?app=PH&t=HusoftTech%20Payments&b=Choose%20the%20best%20way%20to%20pay&bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987&pp=husofttech&pp1=husofttech.global&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&pll=Checkout&pl1=https%3A%2F%2Fexample.com%2Finvoice%2F4587&pll1=Invoice&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&btc1=bc1q8example9secondarywallet0z7k2n3m4p5q6r7s8t&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&eth1=0x1111111254EEB25477B68fb85Ed929f73A960582&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&usdt1=0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&usdtn1=ERC20&sol=9xQeWvG816bUx9EPmexampleSolanaWallet&ac=%230f766e
 ```
 
 Readable example:
 
 ```text
-https://husofttech.com/scanely/?app=PH&title=HusoftTech%20Payments&bio=Choose%20the%20best%20way%20to%20pay&bankName=Garanti%20BBVA&iban=TR330006100519786457841326&accountNumber=458741326&routingCode=610005&bankName1=Akbank&iban1=TR120006200019876543210987&accountNumber1=198765432109&routingCode1=0001987&paypal=husofttech&paymentLink=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&bitcoin=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&ethereum=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&tether=TQn9Y2o5Qh9mP7tLYTexampleTron&tetherNetwork=TRC20&solana=9xQeWvG816bUx9EPmexampleSolanaWallet&accentColor=%230f766e
+https://husofttech.com/scanely/?app=PH&title=HusoftTech%20Payments&bio=Choose%20the%20best%20way%20to%20pay&bankName=Garanti%20BBVA&iban=TR330006100519786457841326&accountNumber=458741326&routingCode=610005&bankName1=Akbank&iban1=TR120006200019876543210987&accountNumber1=198765432109&routingCode1=0001987&paypal=husofttech&paypal1=husofttech.global&paymentLink=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&paymentLinkLabel=Checkout&paymentLink1=https%3A%2F%2Fexample.com%2Finvoice%2F4587&paymentLinkLabel1=Invoice&bitcoin=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&bitcoin1=bc1q8example9secondarywallet0z7k2n3m4p5q6r7s8t&ethereum=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&ethereum1=0x1111111254EEB25477B68fb85Ed929f73A960582&tether=TQn9Y2o5Qh9mP7tLYTexampleTron&tetherNetwork=TRC20&tether1=0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tetherNetwork1=ERC20&solana=9xQeWvG816bUx9EPmexampleSolanaWallet&accentColor=%230f766e
 ```
 
 ### Payment Hub Parameters
@@ -327,6 +327,41 @@ https://husofttech.com/scanely/?app=PH&title=HusoftTech%20Payments&bio=Choose%20
 | PayPal handle / URL | `pp` | `paypal`, `paypalUrl` | Optional | Best passed as a PayPal handle or full `paypal.me` URL |
 | Payment link | `pl` | `paymentLink`, `payLink`, `checkout`, `checkoutUrl` | Optional | Hosted checkout or invoice URL |
 | Payment link label | `pll` | `paymentLinkLabel`, `payLabel` | Optional | Renames the payment-link button |
+
+### Multiple Online Payments
+
+Payment Hub also supports more than one PayPal entry and more than one payment link.
+
+Single-field format still works:
+
+- `pp`, `pl`, `pll`
+- `paypal`, `paymentLink`, `paymentLinkLabel`
+
+If you want more than one online payment method, add a numeric suffix from `1` to `8`.
+
+Short format examples:
+
+- `pp1`, `pp2`
+- `pl1`, `pll1`
+- `pl2`, `pll2`
+
+Readable format examples:
+
+- `paypal1`, `paypal2`
+- `paymentLink1`, `paymentLinkLabel1`
+- `paymentLink2`, `paymentLinkLabel2`
+
+Example:
+
+```text
+&pp=husofttech&pp1=husofttech.global&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&pll=Checkout&pl1=https%3A%2F%2Fexample.com%2Finvoice%2F4587&pll1=Invoice
+```
+
+Notes:
+
+- The original unsuffixed fields still work, so older QR codes remain compatible.
+- Numbered fields are recommended when you need multiple online payment actions.
+- `pll1` or `paymentLinkLabel1` matches `pl1` or `paymentLink1`.
 
 ### Multiple Bank Accounts
 
@@ -375,6 +410,41 @@ Each wallet accepts a short key, a readable long key, and an optional network fi
 | Dogecoin | `doge` | `dogecoin` | `dogen` | `dogeNetwork`, `dogecoinNetwork` |
 | TRON | `trx` | `tron` | `trxn` | `trxNetwork`, `tronNetwork` |
 | Litecoin | `ltc` | `litecoin` | `ltcn` | `ltcNetwork`, `litecoinNetwork` |
+
+### Multiple Crypto Wallets
+
+Payment Hub also supports more than one wallet for the same coin.
+
+Single-field format still works:
+
+- `btc`, `eth`, `usdt`
+- `bitcoin`, `ethereum`, `tether`
+
+If you want more than one wallet for the same coin, add a numeric suffix from `1` to `8`.
+
+Short format examples:
+
+- `btc1`, `btc2`
+- `eth1`, `eth2`
+- `usdt1`, `usdtn1`
+
+Readable format examples:
+
+- `bitcoin1`, `bitcoin2`
+- `ethereum1`, `ethereum2`
+- `tether1`, `tetherNetwork1`
+
+Example:
+
+```text
+&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&btc1=bc1q8example9secondarywallet0z7k2n3m4p5q6r7s8t&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&eth1=0x1111111254EEB25477B68fb85Ed929f73A960582&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&usdt1=0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&usdtn1=ERC20
+```
+
+Notes:
+
+- The original unsuffixed fields still work, so older QR codes remain compatible.
+- Numbered fields are recommended when you need multiple wallets for the same coin.
+- Network fields follow the same suffix as the wallet field, for example `usdtn1` matches `usdt1`.
 
 ### Payment Hub Notes
 
