@@ -660,6 +660,12 @@ select {
     var(--scanely-ghost-bg-hover);
 }
 
+.action-button--compact {
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+}
+
 .action-icon {
   width: 16px;
   height: 16px;
@@ -918,6 +924,283 @@ select {
   margin: 0;
   color: var(--scanely-text-soft);
   line-height: 1.65;
+}
+
+.payment-hub-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.payment-hub-stack > .content-panel__header,
+.payment-section > .content-panel__header {
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+.payment-hub-stack > .content-panel__header .content-title {
+  font-size: clamp(1.2rem, 1vw + 0.95rem, 1.55rem);
+}
+
+.payment-section .content-title {
+  font-size: 1rem;
+}
+
+.payment-hub-stack > .content-panel__header .content-copy,
+.payment-section .content-copy {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.payment-section {
+  display: grid;
+  gap: 8px;
+}
+
+.bank-card-grid,
+.crypto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.bank-card-grid {
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.bank-card,
+.crypto-card {
+  border-radius: var(--scanely-radius-md);
+  box-shadow: var(--scanely-shadow-sm);
+}
+
+.bank-card {
+  display: grid;
+  gap: 6px;
+  padding: 8px 9px;
+  border: 1px solid var(--scanely-border);
+  background:
+    linear-gradient(135deg, rgba(var(--scanely-accent-mist-rgb), 0.18), rgba(var(--scanely-accent-rgb), 0.05) 42%, transparent 80%),
+    var(--scanely-surface-strong);
+}
+
+.bank-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.bank-card__header-lead {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.bank-card__title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bank-card__rows {
+  display: grid;
+  gap: 3px;
+}
+
+.bank-card__row {
+  width: 100%;
+  display: block;
+  padding: 4px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--scanely-accent-rgb), 0.12);
+  background:
+    linear-gradient(135deg, rgba(var(--scanely-accent-mist-rgb), 0.12), rgba(var(--scanely-accent-rgb), 0.04)),
+    rgba(var(--scanely-accent-rgb), 0.04);
+}
+
+.bank-card__row--copyable {
+  appearance: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.bank-card__row--copyable:hover,
+.bank-card__row--copyable:active {
+  transform: translateY(-1px);
+  border-color: rgba(var(--scanely-accent-rgb), 0.24);
+  box-shadow: 0 8px 18px rgba(var(--scanely-accent-rgb), 0.08);
+}
+
+.bank-card__row--copyable:focus-visible {
+  outline: 3px solid var(--scanely-ring);
+  outline-offset: 2px;
+}
+
+.bank-card__row-layout {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 5px;
+}
+
+.bank-card__row-copy-icon {
+  width: 0.78rem;
+  height: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  color: rgba(var(--scanely-accent-rgb), 0.78);
+  flex-shrink: 0;
+}
+
+.bank-card__row-copy-glyph {
+  width: 100%;
+  height: 100%;
+}
+
+.bank-card__row-content {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.bank-card__row-label {
+  margin: 0;
+  color: var(--scanely-text-faint);
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bank-card__row-value {
+  margin: 0;
+  color: var(--scanely-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.18;
+  word-break: break-word;
+}
+
+.payment-section .link-grid {
+  gap: 8px;
+}
+
+.payment-section .link-card {
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 16px;
+}
+
+.payment-section .link-card__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+.payment-section .link-card__glyph,
+.payment-section .link-card__icon-image,
+.payment-section .link-card__glyph--svg svg,
+.payment-section .link-card__glyph--inline svg {
+  width: 20px;
+  height: 20px;
+}
+
+.payment-section .link-card__title {
+  font-size: 0.86rem;
+}
+
+.payment-section .link-card__meta {
+  font-size: 0.76rem;
+}
+
+.crypto-card {
+  --wallet-rgb: var(--scanely-accent-rgb);
+  --wallet-ink: #ffffff;
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(var(--wallet-rgb), 0.2);
+  background:
+    linear-gradient(135deg, rgba(var(--wallet-rgb), 0.18), rgba(var(--wallet-rgb), 0.04) 44%, transparent 82%),
+    var(--scanely-surface-strong);
+}
+
+.crypto-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.crypto-card__identity {
+  display: grid;
+  gap: 3px;
+}
+
+.crypto-card__token-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.crypto-card__symbol,
+.crypto-card__network {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 7px;
+  border-radius: var(--scanely-radius-pill);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.crypto-card__symbol {
+  background: rgba(var(--wallet-rgb), 0.16);
+  color: rgb(var(--wallet-rgb));
+}
+
+.crypto-card__network {
+  background: rgba(var(--wallet-rgb), 0.08);
+  color: var(--scanely-text-soft);
+}
+
+.crypto-card__name {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.crypto-card__address {
+  margin: 0;
+  color: var(--scanely-text-soft);
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  word-break: break-all;
+}
+
+.crypto-card__copy {
+  flex: 0 0 auto;
 }
 
 .business-card-stack {
@@ -1424,6 +1707,12 @@ select {
 
   .business-card__contact {
     grid-template-columns: auto 1fr auto;
+  }
+
+  .bank-card__header,
+  .crypto-card__top {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .tab-list {

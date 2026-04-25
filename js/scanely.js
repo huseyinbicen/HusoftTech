@@ -84,9 +84,25 @@ const DEFAULT_PROFILE = {
 const APP_MODES = {
   SOCIAL_HUB: "SH",
   BUSINESS_CARD: "BC",
+  PAYMENT_HUB: "PH",
 };
 
 const APP_MODE_KEYS = ["app"];
+
+// Payment Hub supports a focused set of widely used coins so the QR mode stays
+// predictable and easy to document.
+const PAYMENT_WALLET_DEFINITIONS = [
+  { id: "btc", label: "Bitcoin", symbol: "BTC", keys: ["btc", "bitcoin"], networkKeys: ["btcn", "btcNetwork", "btc_network", "bitcoinNetwork", "bitcoin_network"], iconHex: "#f7931a", iconInk: "#111827" },
+  { id: "eth", label: "Ethereum", symbol: "ETH", keys: ["eth", "ethereum"], networkKeys: ["ethn", "ethNetwork", "eth_network", "ethereumNetwork", "ethereum_network"], iconHex: "#627eea", iconInk: "#ffffff" },
+  { id: "usdt", label: "Tether", symbol: "USDT", keys: ["usdt", "tether"], networkKeys: ["usdtn", "usdtNetwork", "usdt_network", "tetherNetwork", "tether_network"], iconHex: "#26a17b", iconInk: "#ffffff" },
+  { id: "usdc", label: "USD Coin", symbol: "USDC", keys: ["usdc", "usdcoin"], networkKeys: ["usdcn", "usdcNetwork", "usdc_network", "usdcoinNetwork", "usdcoin_network"], iconHex: "#2775ca", iconInk: "#ffffff" },
+  { id: "sol", label: "Solana", symbol: "SOL", keys: ["sol", "solana"], networkKeys: ["soln", "solNetwork", "sol_network", "solanaNetwork", "solana_network"], iconHex: "#14f195", iconInk: "#062714" },
+  { id: "bnb", label: "BNB", symbol: "BNB", keys: ["bnb", "binance"], networkKeys: ["bnbn", "bnbNetwork", "bnb_network", "binanceNetwork", "binance_network"], iconHex: "#f3ba2f", iconInk: "#111827" },
+  { id: "ada", label: "Cardano", symbol: "ADA", keys: ["ada", "cardano"], networkKeys: ["adan", "adaNetwork", "ada_network", "cardanoNetwork", "cardano_network"], iconHex: "#0033ad", iconInk: "#ffffff" },
+  { id: "doge", label: "Dogecoin", symbol: "DOGE", keys: ["doge", "dogecoin"], networkKeys: ["dogen", "dogeNetwork", "doge_network", "dogecoinNetwork", "dogecoin_network"], iconHex: "#c2a633", iconInk: "#111827" },
+  { id: "trx", label: "TRON", symbol: "TRX", keys: ["trx", "tron"], networkKeys: ["trxn", "trxNetwork", "trx_network", "tronNetwork", "tron_network"], iconHex: "#ef0027", iconInk: "#ffffff" },
+  { id: "ltc", label: "Litecoin", symbol: "LTC", keys: ["ltc", "litecoin"], networkKeys: ["ltcn", "ltcNetwork", "ltc_network", "litecoinNetwork", "litecoin_network"], iconHex: "#345d9d", iconInk: "#ffffff" },
+];
 
 let activeAccentColor = DEFAULT_PROFILE.accent;
 
@@ -112,7 +128,7 @@ function clampText(value, maxLength) {
 function getAppMode(params) {
   const rawMode = getParamValue(params, APP_MODE_KEYS);
   if (!rawMode) {
-    throw new Error("Missing required `app` parameter. Use `app=SH` or `app=BC`.");
+    throw new Error("Missing required `app` parameter. Use `app=SH`, `app=BC`, or `app=PH`.");
   }
 
   const normalizedMode = rawMode.toUpperCase();
@@ -129,6 +145,18 @@ function getAppMode(params) {
   }
 
   if ([
+    APP_MODES.PAYMENT_HUB,
+    "PAYMENTHUB",
+    "PAYMENT-HUB",
+    "PAYMENT_HUB",
+    "PAYMENTS",
+    "PAYMENT",
+    "PAY",
+  ].includes(normalizedMode)) {
+    return APP_MODES.PAYMENT_HUB;
+  }
+
+  if ([
     APP_MODES.SOCIAL_HUB,
     "SOCIALHUB",
     "SOCIAL-HUB",
@@ -139,7 +167,7 @@ function getAppMode(params) {
     return APP_MODES.SOCIAL_HUB;
   }
 
-  throw new Error("Invalid `app` parameter. Use `app=SH` or `app=BC`.");
+  throw new Error("Invalid `app` parameter. Use `app=SH`, `app=BC`, or `app=PH`.");
 }
 
 function hasRenderableParams(params) {
@@ -245,6 +273,30 @@ function normalizePhoneValue(rawValue) {
   return hasLeadingPlus ? `+${digits}` : digits;
 }
 
+function normalizeCompactToken(rawValue, maxLength = 180) {
+  if (!rawValue) return "";
+  return rawValue.trim().replace(/\s+/g, "").slice(0, maxLength);
+}
+
+function normalizeIban(rawValue) {
+  const cleaned = normalizeCompactToken(rawValue, 34).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return cleaned.length >= 8 ? cleaned : "";
+}
+
+function normalizeWalletAddress(rawValue) {
+  return normalizeCompactToken(rawValue, 180);
+}
+
+function formatGroupedValue(value, groupSize = 4) {
+  if (!value) return "";
+  const pattern = new RegExp(`.{1,${groupSize}}`, "g");
+  return value.match(pattern)?.join(" ") || value;
+}
+
+function formatCountLabel(count, singular, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 function normalizeUrl(rawValue) {
   if (!rawValue) return "";
   const trimmed = rawValue.trim();
@@ -278,6 +330,15 @@ function buildDirectUrlOnly(rawValue) {
 
 function buildFlexibleUrl(rawValue) {
   return normalizeUrl(rawValue);
+}
+
+function buildPayPalUrl(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) return directUrl;
+
+  const handle = sanitizeHandle(rawValue);
+  if (!handle || handle.includes("@")) return "";
+  return `https://paypal.me/${handle}`;
 }
 
 function buildDiscordUrl(rawValue) {
@@ -469,6 +530,16 @@ function formatHostDisplay(rawValue) {
   } catch (error) {
     return rawValue.trim();
   }
+}
+
+function formatPayPalDisplay(rawValue) {
+  const directUrl = normalizeUrl(rawValue);
+  if (directUrl) {
+    return formatCompactUrlDisplay(directUrl);
+  }
+
+  const handle = sanitizeHandle(rawValue);
+  return handle ? `paypal.me/${handle}` : "";
 }
 
 function buildCustomLinks(
@@ -701,6 +772,234 @@ function buildBusinessCardLinks(contact, params = new URLSearchParams()) {
   return links;
 }
 
+function buildPaymentHubLinks(params) {
+  const links = [];
+
+  const paypalRaw = getParamValue(params, ["pp", "paypal", "paypalUrl", "paypal_url"]);
+  const paypalHref = buildPayPalUrl(paypalRaw);
+  if (paypalHref) {
+    links.push({
+      id: "paypal",
+      label: "PayPal",
+      caption: formatPayPalDisplay(paypalRaw) || "paypal.me",
+      href: paypalHref,
+      icon: "paypal",
+      iconHex: "#003087",
+      iconInk: "#ffffff",
+      group: "online",
+      isCustom: false,
+    });
+  }
+
+  const paymentLink = normalizeUrl(
+    getParamValue(params, ["pl", "paymentLink", "payment_link", "payLink", "pay_link", "checkout", "checkoutUrl"])
+  );
+  if (paymentLink) {
+    links.push({
+      id: "payment-link",
+      label: clampText(
+        getParamValue(params, ["pll", "paymentLinkLabel", "payment_link_label", "payLabel", "pay_label"]),
+        32
+      ) || "Payment Link",
+      caption: formatCompactUrlDisplay(paymentLink),
+      href: paymentLink,
+      icon: "link",
+      iconHex: "#0f766e",
+      iconInk: "#ffffff",
+      group: "online",
+      isCustom: false,
+    });
+  }
+
+  return links;
+}
+
+function buildCryptoWallets(params) {
+  const wallets = [];
+
+  PAYMENT_WALLET_DEFINITIONS.forEach((wallet) => {
+    const address = normalizeWalletAddress(getParamValue(params, wallet.keys));
+    if (!address) return;
+
+    wallets.push({
+      id: wallet.id,
+      label: wallet.label,
+      symbol: wallet.symbol,
+      address,
+      network: clampText(getParamValue(params, wallet.networkKeys), 24),
+      iconHex: wallet.iconHex,
+      iconInk: wallet.iconInk,
+      feedbackMessage: `${wallet.symbol} address copied.`,
+    });
+  });
+
+  return wallets;
+}
+
+function buildPaymentBankAccount({
+  id = "",
+  index = 0,
+  bankName = "",
+  iban = "",
+  accountNumber = "",
+  routingCode = "",
+} = {}) {
+  if (!bankName && !iban && !accountNumber && !routingCode) return null;
+
+  return {
+    id: id || `bank-${index + 1}`,
+    index,
+    title: bankName,
+    bankName,
+    iban,
+    accountNumber,
+    routingCode,
+    primaryCopy: iban
+      ? {
+          label: "Copy IBAN",
+          copyValue: iban,
+          feedbackMessage: "IBAN copied.",
+        }
+      : accountNumber
+        ? {
+            label: "Copy Account",
+            copyValue: accountNumber,
+            feedbackMessage: "Account number copied.",
+          }
+        : routingCode
+          ? {
+              label: "Copy Routing Number/Bank Code",
+              copyValue: routingCode,
+              feedbackMessage: "Routing Number/Bank Code copied.",
+            }
+        : null,
+  };
+}
+
+function getPaymentBankFieldKeys(field, index = 0) {
+  const suffix = index > 0 ? String(index) : "";
+
+  if (field === "bankName") {
+    return index > 0
+      ? [`bn${suffix}`, `bank${suffix}`, `bankName${suffix}`, `bank_name${suffix}`]
+      : ["bn", "bank", "bankName", "bank_name"];
+  }
+
+  if (field === "iban") {
+    return index > 0
+      ? [`ib${suffix}`, `iban${suffix}`]
+      : ["ib", "iban"];
+  }
+
+  if (field === "accountNumber") {
+    return index > 0
+      ? [`an${suffix}`, `account${suffix}`, `accountNumber${suffix}`, `account_number${suffix}`, `acct${suffix}`]
+      : ["an", "account", "accountNumber", "account_number", "acct"];
+  }
+
+  if (field === "routingCode") {
+    return index > 0
+      ? [
+          `rc${suffix}`,
+          `rn${suffix}`,
+          `bc${suffix}`,
+          `routing${suffix}`,
+          `routingCode${suffix}`,
+          `routingNumber${suffix}`,
+          `routing_number${suffix}`,
+          `bankCode${suffix}`,
+          `bank_code${suffix}`,
+        ]
+      : [
+          "rc",
+          "rn",
+          "bc",
+          "routing",
+          "routingCode",
+          "routingNumber",
+          "routing_number",
+          "bankCode",
+          "bank_code",
+        ];
+  }
+
+  return [];
+}
+
+function buildPaymentBankAccountFromParams(params, index = 0) {
+  const bankName = clampText(
+    getParamValue(params, getPaymentBankFieldKeys("bankName", index)),
+    60
+  );
+  const iban = normalizeIban(getParamValue(params, getPaymentBankFieldKeys("iban", index)));
+  const accountNumber = clampText(
+    getParamValue(params, getPaymentBankFieldKeys("accountNumber", index)).replace(/\s+/g, " "),
+    50
+  );
+  const routingCode = clampText(
+    getParamValue(params, getPaymentBankFieldKeys("routingCode", index)).replace(/\s+/g, " "),
+    40
+  );
+
+  return buildPaymentBankAccount({
+    id: index > 0 ? `bank-${index}` : "bank-primary",
+    index: index > 0 ? index - 1 : 0,
+    bankName,
+    iban,
+    accountNumber,
+    routingCode,
+  });
+}
+
+function getPaymentBankAccountSignature(account) {
+  return [
+    account?.bankName?.toLowerCase() || "",
+    account?.iban || "",
+    account?.accountNumber || "",
+    account?.routingCode || "",
+  ].join("|");
+}
+
+function buildPaymentBankAccounts(params) {
+  const accounts = [];
+  const signatures = new Set();
+
+  const pushAccount = (account) => {
+    if (!account) return;
+
+    const signature = getPaymentBankAccountSignature(account);
+    if (signatures.has(signature)) return;
+
+    signatures.add(signature);
+    accounts.push(account);
+  };
+
+  pushAccount(buildPaymentBankAccountFromParams(params, 0));
+
+  for (let index = 1; index <= 8; index += 1) {
+    pushAccount(buildPaymentBankAccountFromParams(params, index));
+  }
+
+  return accounts;
+}
+
+function buildPaymentPrimaryCopy(payment) {
+  if (payment.bankAccounts?.length) {
+    return null;
+  }
+
+  if (payment.cryptoWallets?.length === 1) {
+    const firstWallet = payment.cryptoWallets[0];
+    return {
+      label: `Copy ${firstWallet.symbol}`,
+      copyValue: firstWallet.address,
+      feedbackMessage: firstWallet.feedbackMessage,
+    };
+  }
+
+  return null;
+}
+
 function buildSharedProfileSettings(params) {
   return {
     isPro: parseBooleanParam(getParamValue(params, ["isPro", "pro", "is_pro"]), false),
@@ -770,6 +1069,29 @@ function buildBusinessCardConfig(params) {
   };
 }
 
+function buildPaymentHubConfig(params) {
+  const bankAccounts = buildPaymentBankAccounts(params);
+  const cryptoWallets = buildCryptoWallets(params);
+  const payment = {
+    bankAccounts,
+    cryptoWallets,
+  };
+
+  return {
+    appMode: APP_MODES.PAYMENT_HUB,
+    mode: "live",
+    title: clampText(getParamValue(params, ["t", "title"]), 60) || "Payment Hub",
+    bio: clampText(getParamValue(params, ["b", "bio", "subtitle", "description"]), 180)
+      || "Choose the payment method that works best for you.",
+    links: buildPaymentHubLinks(params),
+    payment: {
+      ...payment,
+      primaryCopy: buildPaymentPrimaryCopy(payment),
+    },
+    ...buildSharedProfileSettings(params),
+  };
+}
+
 function buildProfileConfig() {
   const params = getSearchParams();
   const appMode = getAppMode(params);
@@ -778,12 +1100,43 @@ function buildProfileConfig() {
     return buildPreviewConfig(appMode, params);
   }
 
-  return appMode === APP_MODES.BUSINESS_CARD
-    ? buildBusinessCardConfig(params)
-    : buildSocialHubConfig(params);
+  if (appMode === APP_MODES.BUSINESS_CARD) {
+    return buildBusinessCardConfig(params);
+  }
+
+  if (appMode === APP_MODES.PAYMENT_HUB) {
+    return buildPaymentHubConfig(params);
+  }
+
+  return buildSocialHubConfig(params);
 }
 
 function buildPreviewConfig(appMode = APP_MODES.SOCIAL_HUB, params = new URLSearchParams()) {
+  if (appMode === APP_MODES.PAYMENT_HUB) {
+    const previewParams = new URLSearchParams(
+      "bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987&pp=husofttech&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&pll=Checkout&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&sol=9xQeWvG816bUx9EPmexampleSolanaWallet&bnb=0x6F46CF5569aefa1Acc1009290c8E043747172d89"
+    );
+    const bankAccounts = buildPaymentBankAccounts(previewParams);
+    const cryptoWallets = buildCryptoWallets(previewParams);
+    const payment = {
+      bankAccounts,
+      cryptoWallets,
+    };
+
+    return {
+      appMode: APP_MODES.PAYMENT_HUB,
+      mode: "preview",
+      title: "HusoftTech Payments",
+      bio: "Choose bank transfer, hosted checkout, or crypto wallet payment.",
+      links: buildPaymentHubLinks(previewParams),
+      payment: {
+        ...payment,
+        primaryCopy: buildPaymentPrimaryCopy(payment),
+      },
+      ...buildSharedProfileSettings(params),
+    };
+  }
+
   if (appMode === APP_MODES.BUSINESS_CARD) {
     const previewParams = new URLSearchParams(
       "c1=https%3A%2F%2Fportfolio.example.com&c1l=Portfolio&c2=https%3A%2F%2Fcal.example.com&c2l=Book%20a%20Call"
@@ -832,12 +1185,18 @@ function buildPreviewConfig(appMode = APP_MODES.SOCIAL_HUB, params = new URLSear
 }
 
 function setPageMetadata(profile) {
-  const pageType = profile.appMode === APP_MODES.BUSINESS_CARD ? "Business Card" : "Social Hub";
+  const pageType = profile.appMode === APP_MODES.BUSINESS_CARD
+    ? "Business Card"
+    : profile.appMode === APP_MODES.PAYMENT_HUB
+      ? "Payment Hub"
+      : "Social Hub";
   const title = `${profile.title} | Scanely ${pageType}`;
   const description = profile.bio
     || (profile.appMode === APP_MODES.BUSINESS_CARD
       ? "Open this Scanely business card."
-      : "Open this Scanely social hub.");
+      : profile.appMode === APP_MODES.PAYMENT_HUB
+        ? "Open this Scanely payment hub."
+        : "Open this Scanely social hub.");
   const image = profile.avatar || "https://husofttech.com/assets/apps/scanely/scanely-qr-logo.png";
   const currentUrl = window.location.href;
 
@@ -935,20 +1294,26 @@ function createElement(tagName, className, textContent) {
 function createIconMarkup(name) {
   const icons = {
     arrow: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>',
+    bank: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9 12 4l8.5 5"></path><path d="M5 10.5h14"></path><path d="M6.5 10.5V18"></path><path d="M10 10.5V18"></path><path d="M14 10.5V18"></path><path d="M17.5 10.5V18"></path><path d="M4 20h16"></path></svg>',
+    card: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="M3.5 10h17"></path><path d="M7.5 14.5h3"></path></svg>',
+    coin: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="7.5" ry="8.5"></ellipse><path d="M9.5 9.5c.6-.8 1.5-1.3 2.6-1.3 1.6 0 2.9 1 2.9 2.4 0 1.2-.8 1.9-2.5 2.3l-1.1.3c-1.4.3-2.1.9-2.1 2 0 1.4 1.2 2.4 2.9 2.4 1.2 0 2.2-.5 2.8-1.4"></path></svg>',
     share: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12 16 8"></path><path d="M8 12 16 16"></path><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="8" r="2.5"></circle><circle cx="18" cy="16" r="2.5"></circle></svg>',
     copy: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="10" height="10" rx="2"></rect><path d="M5 15V7a2 2 0 0 1 2-2h8"></path></svg>',
     download: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"></path><path d="m8 10 4 4 4-4"></path><path d="M4.5 18.5h15"></path></svg>',
+    link: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5 13.5 10.5"></path><path d="M7.8 16.2a3 3 0 0 1 0-4.2l2.5-2.5a3 3 0 0 1 4.2 0"></path><path d="M16.2 7.8a3 3 0 0 1 0 4.2l-2.5 2.5a3 3 0 0 1-4.2 0"></path></svg>',
     sun: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.75v2.5"></path><path d="M12 18.75v2.5"></path><path d="m4.93 4.93 1.77 1.77"></path><path d="m17.3 17.3 1.77 1.77"></path><path d="M2.75 12h2.5"></path><path d="M18.75 12h2.5"></path><path d="m4.93 19.07 1.77-1.77"></path><path d="m17.3 6.7 1.77-1.77"></path></svg>',
     moon: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.3 15.1A8.8 8.8 0 0 1 8.9 3.7a8.8 8.8 0 1 0 11.4 11.4Z"></path></svg>',
     globe: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M3.8 9.2h16.4"></path><path d="M3.8 14.8h16.4"></path><path d="M12 3.5c2.5 2.2 4 5.3 4 8.5s-1.5 6.3-4 8.5c-2.5-2.2-4-5.3-4-8.5s1.5-6.3 4-8.5Z"></path></svg>',
     phone: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.7 4.8c.6-.6 1.6-.6 2.2 0l1.7 1.7c.6.6.6 1.5.2 2.2l-1.2 1.8a14.3 14.3 0 0 0 4.8 4.8l1.8-1.2c.7-.5 1.7-.4 2.2.2l1.7 1.7c.6.6.6 1.6 0 2.2l-1.1 1.1c-.8.8-2 1.1-3.1.8-2.3-.7-4.5-2-6.4-3.9-1.9-1.9-3.2-4.1-3.9-6.4-.3-1.1 0-2.3.8-3.1z"></path></svg>',
     mail: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"></rect><path d="m4.5 7 7.5 6 7.5-6"></path></svg>',
     linkedin: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"></rect><circle cx="8.1" cy="8.1" r="0.9" fill="currentColor" stroke="none"></circle><path d="M8.1 10.5v5.4"></path><path d="M11.9 15.9v-3"></path><path d="M11.9 12.9c0-1.3.9-2.4 2.2-2.4s2.1 1 2.1 2.5v2.9"></path><path d="M16.2 12.9v3"></path></svg>',
+    paypal: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19.5 9.2 5.5h5.4c2.7 0 4.4 1.4 4.4 3.7 0 2.6-1.9 4.4-4.9 4.4h-3.3"></path><path d="M5 19.5h4.4"></path><path d="M8.8 13.6h3c2.2 0 3.7 1 3.7 3 0 2.1-1.6 3.4-4.1 3.4H8.7"></path></svg>',
     briefcase: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7" width="17" height="11.5" rx="2"></rect><path d="M9 7V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8V7"></path><path d="M3.5 11.5h17"></path></svg>',
     building: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V6.5A1.5 1.5 0 0 1 6.5 5H13v15"></path><path d="M13 9.5h4.5A1.5 1.5 0 0 1 19 11v9"></path><path d="M9 9h.01"></path><path d="M9 12.5h.01"></path><path d="M9 16h.01"></path><path d="M16 13.5h.01"></path><path d="M16 17h.01"></path><path d="M3.5 20.5h17"></path></svg>',
     grid: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"></rect><rect x="13" y="3" width="8" height="8" rx="2"></rect><rect x="3" y="13" width="8" height="8" rx="2"></rect><rect x="13" y="13" width="8" height="8" rx="2"></rect></svg>',
     social: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7a3 3 0 1 0-2.9-3.8L8.4 6.5a3 3 0 1 0 0 11l5.7 3.3A3 3 0 1 0 17 17a3 3 0 0 0-.4 1.5l-5.7-3.3a3 3 0 0 0 0-6.4l5.7-3.3A3 3 0 0 0 17 7Z"></path></svg>',
     custom: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5 13.5 10.5"></path><path d="M7.8 16.2a3 3 0 0 1 0-4.2l2.5-2.5a3 3 0 0 1 4.2 0"></path><path d="M16.2 7.8a3 3 0 0 1 0 4.2l-2.5 2.5a3 3 0 0 1-4.2 0"></path></svg>',
+    wallet: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18a2 2 0 0 1 2 2v1.5"></path><path d="M4 8.5h14a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 16.5z"></path><path d="M15.5 13h4"></path><circle cx="15.5" cy="13" r="0.9" fill="currentColor" stroke="none"></circle></svg>',
   };
 
   return icons[name] || icons.globe;
@@ -1038,7 +1403,20 @@ function createInlinePlatformIcon(iconKey, className) {
 }
 
 function createPlatformIcon(iconPath, label, className) {
-  const decorativeIconNames = ["globe", "phone", "mail", "linkedin", "briefcase", "building"];
+  const decorativeIconNames = [
+    "bank",
+    "card",
+    "coin",
+    "globe",
+    "link",
+    "mail",
+    "paypal",
+    "phone",
+    "linkedin",
+    "briefcase",
+    "building",
+    "wallet",
+  ];
 
   if (decorativeIconNames.includes(iconPath)) {
     const wrapper = createElement("span", className);
@@ -1112,6 +1490,22 @@ function createInfoPill(iconName, text, isAccent = false) {
   return pill;
 }
 
+function createCopyActionButton({
+  label = "Copy",
+  copyValue = "",
+  feedbackMessage = "Copied to clipboard.",
+  variant = "ghost",
+  className = "",
+} = {}) {
+  const button = document.createElement("button");
+  button.className = ["action-button", `action-button--${variant}`, className].filter(Boolean).join(" ");
+  button.type = "button";
+  button.dataset.copyValue = copyValue;
+  button.dataset.feedbackMessage = feedbackMessage;
+  button.append(createDecorativeIcon("copy", "action-icon"), document.createTextNode(label));
+  return button;
+}
+
 function renderTopBar(profile) {
   const currentTheme = getActiveTheme();
   const topBarClassName = profile.isPro
@@ -1173,6 +1567,9 @@ function renderSummaryPanel(profile) {
   if (profile.appMode === APP_MODES.BUSINESS_CARD) {
     const badgeRow = renderBusinessBadgeRow(profile);
     if (badgeRow) summary.appendChild(badgeRow);
+  } else if (profile.appMode === APP_MODES.PAYMENT_HUB) {
+    const badgeRow = renderPaymentBadgeRow(profile);
+    if (badgeRow) summary.appendChild(badgeRow);
   }
 
   return summary;
@@ -1180,7 +1577,14 @@ function renderSummaryPanel(profile) {
 
 function renderActionRow(profile) {
   const isBusinessCard = profile.appMode === APP_MODES.BUSINESS_CARD;
-  const actions = createElement("div", isBusinessCard ? "action-row" : "action-row action-row--utility");
+  const isPaymentHub = profile.appMode === APP_MODES.PAYMENT_HUB;
+  const hasPrimaryPaymentCopy = isPaymentHub && Boolean(profile.payment?.primaryCopy?.copyValue);
+  const actions = createElement(
+    "div",
+    isBusinessCard || hasPrimaryPaymentCopy
+      ? "action-row"
+      : "action-row action-row--utility"
+  );
 
   const shareButton = document.createElement("button");
   shareButton.className = "action-button action-button--ghost";
@@ -1209,6 +1613,20 @@ function renderActionRow(profile) {
     secondary.appendChild(shareButton);
     secondary.appendChild(copyButton);
     actions.appendChild(secondary);
+  } else if (hasPrimaryPaymentCopy) {
+    actions.appendChild(
+      createCopyActionButton({
+        label: profile.payment.primaryCopy.label,
+        copyValue: profile.payment.primaryCopy.copyValue,
+        feedbackMessage: profile.payment.primaryCopy.feedbackMessage,
+        variant: "primary",
+      })
+    );
+
+    const secondary = createElement("div", "action-row__secondary");
+    secondary.appendChild(shareButton);
+    secondary.appendChild(copyButton);
+    actions.appendChild(secondary);
   } else {
     actions.appendChild(shareButton);
     actions.appendChild(copyButton);
@@ -1218,6 +1636,10 @@ function renderActionRow(profile) {
 }
 
 function renderContentPanel(profile, counts) {
+  if (profile.appMode === APP_MODES.PAYMENT_HUB) {
+    return renderPaymentHubPanel(profile);
+  }
+
   if (profile.appMode === APP_MODES.BUSINESS_CARD) {
     return renderBusinessCardPanel(profile);
   }
@@ -1237,6 +1659,29 @@ function renderBusinessBadgeRow(profile) {
 
   if (profile.contact?.company) {
     badgeRow.appendChild(createInfoPill("building", profile.contact.company));
+  }
+
+  return badgeRow.childElementCount ? badgeRow : null;
+}
+
+function renderPaymentBadgeRow(profile) {
+  const badgeRow = createElement("div", "badge-row");
+  badgeRow.appendChild(createInfoPill("wallet", "Payment Hub", true));
+
+  if (profile.payment?.bankAccounts?.length) {
+    badgeRow.appendChild(
+      createInfoPill("bank", formatCountLabel(profile.payment.bankAccounts.length, "bank account"))
+    );
+  }
+
+  if (profile.links.length) {
+    badgeRow.appendChild(createInfoPill("link", formatCountLabel(profile.links.length, "online option")));
+  }
+
+  if (profile.payment?.cryptoWallets?.length) {
+    badgeRow.appendChild(
+      createInfoPill("coin", formatCountLabel(profile.payment.cryptoWallets.length, "crypto wallet"))
+    );
   }
 
   return badgeRow.childElementCount ? badgeRow : null;
@@ -1308,6 +1753,141 @@ function createBusinessCardContactRow({ label, value, href = "", icon = "globe" 
   }
 
   return row;
+}
+
+function createBankAccountFieldRow({
+  label = "",
+  value = "",
+  copyValue = "",
+  feedbackMessage = "",
+} = {}) {
+  const isCopyable = Boolean(copyValue);
+  const row = isCopyable ? document.createElement("button") : createElement("div", "bank-card__row");
+  row.className = isCopyable ? "bank-card__row bank-card__row--copyable" : "bank-card__row";
+
+  if (isCopyable) {
+    row.type = "button";
+    row.dataset.copyValue = copyValue;
+    row.dataset.feedbackMessage = feedbackMessage || `${label} copied.`;
+    row.setAttribute("aria-label", `Copy ${label}: ${value}`);
+  }
+
+  const layout = createElement("div", "bank-card__row-layout");
+
+  if (isCopyable) {
+    const iconWrap = createElement("span", "bank-card__row-copy-icon");
+    iconWrap.setAttribute("aria-hidden", "true");
+    iconWrap.appendChild(createDecorativeIcon("copy", "bank-card__row-copy-glyph"));
+    layout.appendChild(iconWrap);
+  }
+
+  const content = createElement("div", "bank-card__row-content");
+
+  content.appendChild(createElement("p", "bank-card__row-label", label));
+  content.appendChild(createElement("p", "bank-card__row-value", value));
+  layout.appendChild(content);
+  row.appendChild(layout);
+
+  return row;
+}
+
+function createBankAccountCard(account, index) {
+  const card = createElement("article", "bank-card");
+  const header = createElement("div", "bank-card__header");
+  const headerLead = createElement("div", "bank-card__header-lead");
+
+  headerLead.appendChild(
+    createElement("h3", "bank-card__title", account.title || `Bank Account ${index + 1}`)
+  );
+  header.appendChild(headerLead);
+
+  card.appendChild(header);
+
+  const rows = createElement("div", "bank-card__rows");
+
+  if (account.iban) {
+    rows.appendChild(
+      createBankAccountFieldRow({
+        label: "IBAN",
+        value: formatGroupedValue(account.iban),
+        copyValue: account.iban,
+        feedbackMessage: "IBAN copied.",
+      })
+    );
+  }
+
+  if (account.accountNumber) {
+    rows.appendChild(
+      createBankAccountFieldRow({
+        label: "Account",
+        value: account.accountNumber,
+        copyValue: account.accountNumber,
+        feedbackMessage: "Account number copied.",
+      })
+    );
+  }
+
+  if (account.routingCode) {
+    rows.appendChild(
+      createBankAccountFieldRow({
+        label: "Routing Number/Bank Code",
+        value: account.routingCode,
+        copyValue: account.routingCode,
+        feedbackMessage: "Routing Number/Bank Code copied.",
+      })
+    );
+  }
+
+  if (rows.childElementCount) {
+    card.appendChild(rows);
+  }
+
+  return card;
+}
+
+function renderBankAccountGrid(accounts) {
+  const grid = createElement("div", "bank-card-grid");
+  accounts.forEach((account, index) => {
+    grid.appendChild(createBankAccountCard(account, index));
+  });
+  return grid;
+}
+
+function renderCryptoWalletGrid(wallets) {
+  const grid = createElement("div", "crypto-grid");
+
+  wallets.forEach((wallet) => {
+    const card = createElement("article", "crypto-card");
+    card.style.setProperty("--wallet-rgb", hexToRgbTuple(wallet.iconHex || activeAccentColor));
+    card.style.setProperty("--wallet-ink", wallet.iconInk || getContrastingInk(wallet.iconHex || activeAccentColor));
+
+    const top = createElement("div", "crypto-card__top");
+    const identity = createElement("div", "crypto-card__identity");
+    const tokenRow = createElement("div", "crypto-card__token-row");
+    tokenRow.appendChild(createElement("span", "crypto-card__symbol", wallet.symbol));
+
+    if (wallet.network) {
+      tokenRow.appendChild(createElement("span", "crypto-card__network", wallet.network));
+    }
+
+    identity.appendChild(tokenRow);
+    identity.appendChild(createElement("h3", "crypto-card__name", wallet.label));
+    top.appendChild(identity);
+    top.appendChild(
+      createCopyActionButton({
+        label: "Copy",
+        copyValue: wallet.address,
+        feedbackMessage: wallet.feedbackMessage,
+        className: "action-button--compact crypto-card__copy",
+      })
+    );
+
+    card.appendChild(top);
+    card.appendChild(createElement("p", "crypto-card__address", wallet.address));
+    grid.appendChild(card);
+  });
+
+  return grid;
 }
 
 function renderBusinessCardCanvas(profile) {
@@ -1447,6 +2027,77 @@ function renderBusinessCardPanel(profile) {
       "Add phone, email, website, LinkedIn, or custom link parameters to show tappable links on the business card."
     )
   );
+
+  content.appendChild(stack);
+  return content;
+}
+
+function renderPaymentHubPanel(profile) {
+  const content = createElement("section", "content-panel");
+  const stack = createElement("div", "payment-hub-stack");
+  const hasBank = Boolean(profile.payment?.bankAccounts?.length);
+  const hasOnline = Boolean(profile.links.length);
+  const hasCrypto = Boolean(profile.payment?.cryptoWallets?.length);
+
+  stack.appendChild(
+    renderSectionHeader(
+      "Payment Hub",
+      "Compact payment profile",
+      "Bank, links, crypto."
+    )
+  );
+
+  if (hasBank) {
+    const section = createElement("section", "payment-section");
+    section.appendChild(
+      renderSectionHeader(
+        "Bank Transfer",
+        "Bank accounts"
+      )
+    );
+    section.appendChild(renderBankAccountGrid(profile.payment.bankAccounts));
+    stack.appendChild(section);
+  }
+
+  if (hasOnline) {
+    const section = createElement("section", "payment-section");
+    section.appendChild(
+      renderSectionHeader(
+        "Online Payments",
+        "Payment links"
+      )
+    );
+    section.appendChild(
+      renderLinkGrid(
+        profile.links,
+        "No online payment links yet",
+        "Add PayPal or a payment link to show quick open buttons here."
+      )
+    );
+    stack.appendChild(section);
+  }
+
+  if (hasCrypto) {
+    const section = createElement("section", "payment-section");
+    section.appendChild(
+      renderSectionHeader(
+        "Crypto Wallets",
+        "Crypto wallets"
+      )
+    );
+    section.appendChild(renderCryptoWalletGrid(profile.payment.cryptoWallets));
+    stack.appendChild(section);
+  }
+
+  if (!hasBank && !hasOnline && !hasCrypto) {
+    stack.appendChild(
+      renderLinkGrid(
+        [],
+        "No payment methods yet",
+        "Add bank transfer details, a PayPal handle, a payment link, or one of the supported crypto wallet parameters to populate the payment hub."
+      )
+    );
+  }
 
   content.appendChild(stack);
   return content;
@@ -1760,6 +2411,7 @@ function attachActionHandlers(profile) {
   const saveButton = scanelyRoot.querySelector('[data-action="save-contact"]');
   const shareButton = scanelyRoot.querySelector('[data-action="share-page"]');
   const copyButton = scanelyRoot.querySelector('[data-action="copy-page"]');
+  const copyValueButtons = scanelyRoot.querySelectorAll("[data-copy-value]");
   const themeButtons = scanelyRoot.querySelectorAll("[data-theme-value]");
 
   if (saveButton) {
@@ -1779,6 +2431,17 @@ function attachActionHandlers(profile) {
       copyProfileLink();
     });
   }
+
+  copyValueButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      const copied = await copyText(button.dataset.copyValue || "");
+      showFeedback(
+        copied
+          ? button.dataset.feedbackMessage || "Copied to clipboard."
+          : "Copy is not available in this browser."
+      );
+    });
+  });
 
   themeButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -1810,13 +2473,15 @@ function watchSystemThemeChanges() {
 }
 
 function renderProfile(profile) {
+  const themedLinks = profile.links.map((link) => ({
+    ...link,
+    themeHex: profile.accent,
+    themeInk: getContrastingInk(profile.accent),
+  }));
+
   const profileWithColors = {
     ...profile,
-    links: profile.links.map((link) => ({
-      ...link,
-      themeHex: profile.accent,
-      themeInk: getContrastingInk(profile.accent),
-    })),
+    links: themedLinks,
   };
 
   const counts = createCounts(profileWithColors);

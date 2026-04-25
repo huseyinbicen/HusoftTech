@@ -2,10 +2,11 @@
 
 This folder contains the static Scanely web page that opens from a QR code.
 
-It now supports two page types from the same endpoint:
+It now supports three page types from the same endpoint:
 
 - `app=SH`: Social Hub
 - `app=BC`: Business Card
+- `app=PH`: Payment Hub
 
 ## Public Endpoint
 
@@ -28,8 +29,9 @@ Use the `app` query parameter to choose the page type.
 |---|---|---|
 | Social Hub | `SH` | Linktree-style list of social and custom links |
 | Business Card | `BC` | Contact card with quick actions and downloadable `.vcf` |
+| Payment Hub | `PH` | Bank transfer, online payment, and crypto wallet landing page |
 
-The `app` parameter is required. Use `app=SH` for Social Hub or `app=BC` for Business Card.
+The `app` parameter is required. Use `app=SH` for Social Hub, `app=BC` for Business Card, or `app=PH` for Payment Hub.
 
 ## Shared Parameters
 
@@ -286,14 +288,105 @@ These custom links are shown on the business card and in the larger quick-action
 
 ## Best Practice For QR Codes
 
-- Put `app=SH` or `app=BC` first when generating the final URL
+- Put `app=SH`, `app=BC`, or `app=PH` first when generating the final URL
 - Prefer short keys like `fn`, `ln`, `jt`, `co`, `ph`, `em`, `web`, `li`
 - Avoid long bios or subtitles
 - Avoid too many custom links in one social QR code
+- Keep Payment Hub URLs focused. Too many wallet addresses can make QR codes denser and harder to scan.
+- Crypto networks matter. Especially for tokens like USDT and USDC, always share the correct network with the address.
 - Use `isPro=true` if you want the cleanest top area
+
+## Payment Hub Mode
+
+Use `app=PH` to show a payment-first landing page with bank transfer details, direct payment links, and crypto wallet copy buttons.
+
+### Recommended URL
+
+Short QR-friendly example:
+
+```text
+https://husofttech.com/scanely/?app=PH&t=HusoftTech%20Payments&b=Choose%20the%20best%20way%20to%20pay&bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987&pp=husofttech&pl=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&btc=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&eth=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&usdt=TQn9Y2o5Qh9mP7tLYTexampleTron&usdtn=TRC20&sol=9xQeWvG816bUx9EPmexampleSolanaWallet&ac=%230f766e
+```
+
+Readable example:
+
+```text
+https://husofttech.com/scanely/?app=PH&title=HusoftTech%20Payments&bio=Choose%20the%20best%20way%20to%20pay&bankName=Garanti%20BBVA&iban=TR330006100519786457841326&accountNumber=458741326&routingCode=610005&bankName1=Akbank&iban1=TR120006200019876543210987&accountNumber1=198765432109&routingCode1=0001987&paypal=husofttech&paymentLink=https%3A%2F%2Fbuy.stripe.com%2Ftest_4gw7vKgYw4example&bitcoin=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&ethereum=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&tether=TQn9Y2o5Qh9mP7tLYTexampleTron&tetherNetwork=TRC20&solana=9xQeWvG816bUx9EPmexampleSolanaWallet&accentColor=%230f766e
+```
+
+### Payment Hub Parameters
+
+| Field | Short | Long | Required? | Notes |
+|---|---|---|---|---|
+| Title | `t` | `title` | Optional | Defaults to `Payment Hub` |
+| Bio / subtitle | `b` | `bio`, `subtitle`, `description` | Optional | Short helper text below the title |
+| Bank name | `bn` | `bank`, `bankName` | Optional | Name of the receiving bank |
+| IBAN | `ib` | `iban` | Optional | Tap the row to copy |
+| Account number | `an` | `account`, `accountNumber`, `acct` | Optional | Useful for local transfer instructions |
+| Routing Number/Bank Code | `rc`, `rn`, `bc` | `routing`, `routingCode`, `routingNumber`, `bankCode` | Optional | Use for routing numbers or local bank codes |
+| PayPal handle / URL | `pp` | `paypal`, `paypalUrl` | Optional | Best passed as a PayPal handle or full `paypal.me` URL |
+| Payment link | `pl` | `paymentLink`, `payLink`, `checkout`, `checkoutUrl` | Optional | Hosted checkout or invoice URL |
+| Payment link label | `pll` | `paymentLinkLabel`, `payLabel` | Optional | Renames the payment-link button |
+
+### Multiple Bank Accounts
+
+Payment Hub still supports the original single bank fields:
+
+- `bn`, `ib`, `an`, `rc`
+- `bankName`, `iban`, `accountNumber`, `routingCode`
+
+If you want more than one bank account, add a numeric suffix from `1` to `8`.
+
+Short format examples:
+
+- `bn1`, `ib1`, `an1`, `rc1`
+- `bn2`, `ib2`, `an2`, `rc2`
+
+Readable format examples:
+
+- `bankName1`, `iban1`, `accountNumber1`, `routingCode1`
+- `bankName2`, `iban2`, `accountNumber2`, `routingCode2`
+
+Example:
+
+```text
+&bn=Garanti%20BBVA&ib=TR330006100519786457841326&an=458741326&rc=610005&bn1=Akbank&ib1=TR120006200019876543210987&an1=198765432109&rc1=0001987
+```
+
+Notes:
+
+- The original unsuffixed fields still work, so older QR codes remain compatible.
+- The numbered fields are recommended for new Payment Hub QR codes when you need more than one bank account.
+- Each bank account is shown as its own compact card with tap-to-copy rows for the IBAN, account number, and Routing Number/Bank Code.
+
+### Supported Crypto Wallets
+
+Each wallet accepts a short key, a readable long key, and an optional network field.
+
+| Coin | Address Short | Address Long | Network Short | Network Long |
+|---|---|---|---|---|
+| Bitcoin | `btc` | `bitcoin` | `btcn` | `btcNetwork`, `bitcoinNetwork` |
+| Ethereum | `eth` | `ethereum` | `ethn` | `ethNetwork`, `ethereumNetwork` |
+| Tether | `usdt` | `tether` | `usdtn` | `usdtNetwork`, `tetherNetwork` |
+| USD Coin | `usdc` | `usdcoin` | `usdcn` | `usdcNetwork`, `usdcoinNetwork` |
+| Solana | `sol` | `solana` | `soln` | `solNetwork`, `solanaNetwork` |
+| BNB | `bnb` | `binance` | `bnbn` | `bnbNetwork`, `binanceNetwork` |
+| Cardano | `ada` | `cardano` | `adan` | `adaNetwork`, `cardanoNetwork` |
+| Dogecoin | `doge` | `dogecoin` | `dogen` | `dogeNetwork`, `dogecoinNetwork` |
+| TRON | `trx` | `tron` | `trxn` | `trxNetwork`, `tronNetwork` |
+| Litecoin | `ltc` | `litecoin` | `ltcn` | `ltcNetwork`, `litecoinNetwork` |
+
+### Payment Hub Notes
+
+- Payment Hub is still fully static. All values come from the URL query string.
+- Public payment details like IBANs and wallet addresses will be visible in the generated URL.
+- Multiple bank accounts are supported from `1` to `8` using numbered keys like `bn1`, `ib1`, `an1`, `rc1`.
+- For PayPal, pass either a plain handle like `pp=husofttech` or a full URL like `paypal=https://paypal.me/husofttech`.
+- For tokens and multi-network assets, always include the network when possible. Example: `usdt=...&usdtn=TRC20`.
+- If you only need a few wallets, prefer only sharing the ones you actually use so the QR code stays easier to scan.
 
 ## Related Files
 
 - `scanely/index.html`: page entry
-- `js/scanely.js`: query parser, page rendering, business card `.vcf` generator
+- `js/scanely.js`: query parser, page rendering, business card `.vcf` generator, payment hub copy actions
 - `css/scanely.css`: styling
