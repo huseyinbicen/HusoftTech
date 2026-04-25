@@ -134,7 +134,7 @@ Every supported SVG logo has a short key and a long key.
 - Spotify accepts either a username like `sp=exampleuser` or a full Spotify profile URL.
 - WeChat accepts either a full share URL or a plain WeChat ID. When you pass only a WeChat ID, Scanely builds a best-effort mobile `weixin://` deep link.
 - Discord, LINE, Messenger, Signal, and Viber are still safest when you pass full URLs.
-- For Mastodon, use either a full URL or a handle like `@user@server.com`.
+- For Mastodon, use either a plain username like `exampleuser` or a full profile URL like `https://mastodon.social/@exampleuser`. If you need another server, pass the full profile URL.
 
 ### Social Value Samples
 
@@ -158,7 +158,7 @@ Use the sample values below after either the short key or the long key. Example:
 | Pinterest | `exampleuser` | `https://www.pinterest.com/exampleuser/` |
 | Twitch | `exampleuser` | `https://www.twitch.tv/exampleuser` |
 | Bluesky | `example.bsky.social` | `https://bsky.app/profile/example.bsky.social` |
-| Mastodon | `@example@mastodon.social` | `https://mastodon.social/@example` |
+| Mastodon | `exampleuser` | `https://mastodon.social/@exampleuser` |
 | LINE | `URL recommended` | `https://line.me/ti/p/example` |
 | Messenger | `URL recommended` | `https://m.me/exampleuser` |
 | Signal | `URL recommended` | `https://signal.me/#eu/example` |

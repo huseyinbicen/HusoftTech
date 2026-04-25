@@ -380,9 +380,18 @@ function buildMastodonUrl(rawValue) {
   const directUrl = normalizeUrl(rawValue);
   if (directUrl) return directUrl;
 
-  const match = rawValue.trim().match(/^@?([^@\s]+)@([^@\s]+)$/);
-  if (!match) return "";
-  return `https://${match[2]}/@${match[1]}`;
+  const value = rawValue.trim();
+  if (!value) return "";
+
+  const federatedHandle = value.match(/^@?([^@\s]+)@([^@\s]+)$/);
+  if (federatedHandle) {
+    return `https://${federatedHandle[2]}/@${federatedHandle[1]}`;
+  }
+
+  const username = sanitizeHandle(value);
+  if (!username || username.includes("@")) return "";
+
+  return `https://mastodon.social/@${username}`;
 }
 
 function buildWeChatUrl(rawValue) {
@@ -427,7 +436,16 @@ function formatMastodonDisplay(rawValue) {
   if (normalizeUrl(rawValue)) {
     return formatHostDisplay(rawValue);
   }
-  return rawValue.trim();
+
+  const value = rawValue.trim();
+  if (!value) return "";
+
+  if (/^@?[^@\s]+@[^@\s]+$/.test(value)) {
+    return value.startsWith("@") ? value : `@${value}`;
+  }
+
+  const username = sanitizeHandle(value);
+  return username ? `@${username}` : "";
 }
 
 function formatIdentifierOrHostDisplay(rawValue) {
