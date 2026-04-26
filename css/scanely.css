@@ -193,6 +193,7 @@ select {
   content: "";
   position: absolute;
   inset: -14%;
+  will-change: transform;
 }
 
 .scanely-bg::before {
@@ -227,6 +228,7 @@ select {
   border-radius: 50%;
   filter: blur(8px);
   animation: scanely-float 16s ease-in-out infinite;
+  will-change: transform;
 }
 
 .scanely-orb-one {
